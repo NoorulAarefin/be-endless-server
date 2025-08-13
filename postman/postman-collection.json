@@ -1,0 +1,573 @@
+{
+  "info": {
+    "_postman_id": "be-endless-api-collection-clean",
+    "name": "Be-Endless API (Clean)",
+    "description": "Readable, accurate API collection for Be-Endless backend. Matches current routes and request bodies.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:3000", "type": "string" },
+    { "key": "access_token", "value": "", "type": "string" },
+    { "key": "refresh_token", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Auth - Signup",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"fullName\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"Secret123\",\n  \"mobileNo\": \"9876543210\"\n}" },
+            "url": { "raw": "{{base_url}}/signup", "host": ["{{base_url}}"], "path": ["signup"] }
+          }
+        },
+        {
+          "name": "Auth - Login",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"Secret123\"\n}" },
+            "url": { "raw": "{{base_url}}/login", "host": ["{{base_url}}"], "path": ["login"] }
+          }
+        },
+        {
+          "name": "Auth - Get Profile",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "url": { "raw": "{{base_url}}/me", "host": ["{{base_url}}"], "path": ["me"] }
+          }
+        },
+        {
+          "name": "Auth - Update Profile",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"John Updated\",\n  \"mobileNumber\": \"9876543210\",\n  \"email\": \"john.updated@example.com\"\n}" },
+            "url": { "raw": "{{base_url}}/update-profile", "host": ["{{base_url}}"], "path": ["update-profile"] }
+          }
+        },
+        {
+          "name": "Auth - Refresh Token",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/refresh/{{refresh_token}}", "host": ["{{base_url}}"], "path": ["refresh", "{{refresh_token}}"] }
+          }
+        },
+        {
+          "name": "Auth - Logout",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "url": { "raw": "{{base_url}}/logout", "host": ["{{base_url}}"], "path": ["logout"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "User Addresses",
+      "item": [
+        {
+          "name": "Addresses - Get",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "url": { "raw": "{{base_url}}/user/addresses", "host": ["{{base_url}}"], "path": ["user", "addresses"] }
+          }
+        },
+        {
+          "name": "Addresses - Add Additional",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"label\": \"Home\",\n  \"street\": \"123 Street\",\n  \"city\": \"Mumbai\",\n  \"state\": \"Maharashtra\",\n  \"postalCode\": \"400001\",\n  \"country\": \"India\",\n  \"location\": { \n    \"type\": \"Point\", \n    \"coordinates\": [72.8777, 19.0760]\n  }\n}" },
+            "url": { "raw": "{{base_url}}/user/addresses/additional", "host": ["{{base_url}}"], "path": ["user", "addresses", "additional"] }
+          }
+        },
+        {
+          "name": "Addresses - Update Home/Work",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"homeAddress\": {\n    \"label\": \"Home\",\n    \"street\": \"456 Home St\",\n    \"city\": \"Delhi\",\n    \"state\": \"Delhi\",\n    \"postalCode\": \"110001\",\n    \"country\": \"India\",\n    \"location\": { \"type\": \"Point\", \"coordinates\": [77.2090, 28.6139] }\n  }\n}" },
+            "url": { "raw": "{{base_url}}/user/addresses", "host": ["{{base_url}}"], "path": ["user", "addresses"] }
+          }
+        },
+        {
+          "name": "Addresses - Update Additional",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"label\": \"Office\"\n}" },
+            "url": { "raw": "{{base_url}}/user/addresses/additional/{{address_id}}", "host": ["{{base_url}}"], "path": ["user", "addresses", "additional", "{{address_id}}"] }
+          }
+        },
+        {
+          "name": "Addresses - Delete Additional",
+          "request": {
+            "method": "DELETE",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "url": { "raw": "{{base_url}}/user/addresses/additional/{{address_id}}", "host": ["{{base_url}}"], "path": ["user", "addresses", "additional", "{{address_id}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Catalog (Public)",
+      "item": [
+        {
+          "name": "Product - Get by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/product/{{product_id}}", "host": ["{{base_url}}"], "path": ["product", "{{product_id}}"] }
+          }
+        },
+        {
+          "name": "Products - List (filters)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"categoryId\": \"{{category_id}}\",\n  \"skip\": 0,\n  \"limit\": 10,\n  \"minPrice\": 1000,\n  \"maxPrice\": 5000,\n  \"sortBy\": \"price\",\n  \"sortOrder\": \"asc\",\n  \"isFeatured\": true\n}" },
+            "url": { "raw": "{{base_url}}/get-products", "host": ["{{base_url}}"], "path": ["get-products"] }
+          }
+        },
+        {
+          "name": "Products - All (simple list)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"skip\": 0,\n  \"limit\": 20,\n  \"isActive\": true\n}" },
+            "url": { "raw": "{{base_url}}/get-Allproducts", "host": ["{{base_url}}"], "path": ["get-Allproducts"] }
+          }
+        },
+        {
+          "name": "Products - Featured",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/featured-products", "host": ["{{base_url}}"], "path": ["featured-products"] }
+          }
+        },
+        {
+          "name": "Products - Search",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"searchTerm\": \"wheat\",\n  \"skip\": 0,\n  \"limit\": 10\n}" },
+            "url": { "raw": "{{base_url}}/search-products", "host": ["{{base_url}}"], "path": ["search-products"] }
+          }
+        },
+        {
+          "name": "Products - Nearby (requires auth)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"latitude\": 19.0760,\n  \"longitude\": 72.8777,\n  \"maxDistance\": 50000,\n  \"skip\": 0,\n  \"limit\": 10\n}" },
+            "url": { "raw": "{{base_url}}/products/nearby", "host": ["{{base_url}}"], "path": ["products", "nearby"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Shopping Cart",
+      "item": [
+        {
+          "name": "Cart - Add Item",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"productId\": \"{{product_id}}\",\n  \"quantity\": 2\n}" },
+            "url": { "raw": "{{base_url}}/add-toCart", "host": ["{{base_url}}"], "path": ["add-toCart"] }
+          }
+        },
+        {
+          "name": "Cart - Get Items",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "url": { "raw": "{{base_url}}/get-cartItems", "host": ["{{base_url}}"], "path": ["get-cartItems"] }
+          }
+        },
+        {
+          "name": "Cart - Update Item",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"id\": \"{{cart_id}}\",\n  \"quantity\": 3\n}" },
+            "url": { "raw": "{{base_url}}/update-cartItems", "host": ["{{base_url}}"], "path": ["update-cartItems"] }
+          }
+        },
+        {
+          "name": "Cart - Delete Item",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"id\": \"{{cart_id}}\"\n}" },
+            "url": { "raw": "{{base_url}}/delete-cartItems", "host": ["{{base_url}}"], "path": ["delete-cartItems"] }
+          }
+        },
+        {
+          "name": "Cart - Get Details By IDs",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"cartIds\": [\"{{cart_id}}\"]\n}" },
+            "url": { "raw": "{{base_url}}/get-cartDetailsByIds", "host": ["{{base_url}}"], "path": ["get-cartDetailsByIds"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Orders - Buy (from cart)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"cartId\": [\"{{cart_id}}\"],\n  \"paymentAttemptId\": \"{{payment_attempt_id}}\"\n}" },
+            "url": { "raw": "{{base_url}}/buy-product", "host": ["{{base_url}}"], "path": ["buy-product"] }
+          }
+        },
+        {
+          "name": "Orders - My Orders",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"isSeller\": false\n}" },
+            "url": { "raw": "{{base_url}}/get-myOrders", "host": ["{{base_url}}"], "path": ["get-myOrders"] }
+          }
+        },
+        {
+          "name": "Orders (Admin) - Update Status",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"orderId\": \"{{order_id}}\",\n  \"isSeller\": false\n}" },
+            "url": { "raw": "{{base_url}}/update-order-status", "host": ["{{base_url}}"], "path": ["update-order-status"] }
+          }
+        },
+        {
+          "name": "Orders - Payment Details",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "url": { "raw": "{{base_url}}/get-paymentDetails", "host": ["{{base_url}}"], "path": ["get-paymentDetails"] }
+          }
+        },
+        {
+          "name": "Orders (Admin) - All Orders",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"skip\": 0,\n  \"limit\": 20\n}" },
+            "url": { "raw": "{{base_url}}/get-allOrders", "host": ["{{base_url}}"], "path": ["get-allOrders"] }
+          }
+        },
+        {
+          "name": "Orders (Admin) - With Payments",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "url": { "raw": "{{base_url}}/admin/orders-with-payments", "host": ["{{base_url}}"], "path": ["admin", "orders-with-payments"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "Payments - Create Attempt (Cart)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"amount\": 2400,\n  \"cartId\": [\"{{cart_id}}\"],\n  \"paymentMethod\": \"COD\"\n}" },
+            "url": { "raw": "{{base_url}}/api/payments/create", "host": ["{{base_url}}"], "path": ["api", "payments", "create"] }
+          }
+        },
+        {
+          "name": "Payments - Update Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"paymentAttemptId\": \"{{payment_attempt_id}}\",\n  \"status\": \"completed\"\n}" },
+            "url": { "raw": "{{base_url}}/api/payments/update-status", "host": ["{{base_url}}"], "path": ["api", "payments", "update-status"] }
+          }
+        },
+        {
+          "name": "Payments - My Attempts",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "url": { "raw": "{{base_url}}/api/payments/user", "host": ["{{base_url}}"], "path": ["api", "payments", "user"] }
+          }
+        },
+        {
+          "name": "Payments - Get Attempt by ID",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "url": { "raw": "{{base_url}}/api/payments/{{payment_attempt_id}}", "host": ["{{base_url}}"], "path": ["api", "payments", "{{payment_attempt_id}}"] }
+          }
+        },
+        {
+          "name": "Payments - Cancel Attempt",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{}" },
+            "url": { "raw": "{{base_url}}/api/payments/{{payment_attempt_id}}/cancel", "host": ["{{base_url}}"], "path": ["api", "payments", "{{payment_attempt_id}}", "cancel"] }
+          }
+        },
+        {
+          "name": "Payments (Admin) - All Attempts",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "url": { "raw": "{{base_url}}/api/payments/all", "host": ["{{base_url}}"], "path": ["api", "payments", "all"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Notifications - Get",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "url": { "raw": "{{base_url}}/get-notifications", "host": ["{{base_url}}"], "path": ["get-notifications"] }
+          }
+        },
+        {
+          "name": "Notifications - Mark Read",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"id\": \"{{notification_id}}\"\n}" },
+            "url": { "raw": "{{base_url}}/mark-notification-read", "host": ["{{base_url}}"], "path": ["mark-notification-read"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Categories",
+      "item": [
+        {
+          "name": "Admin Categories - Create",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "categoryName", "value": "Grains", "type": "text" },
+                { "key": "bgColor", "value": "#FF6B6B", "type": "text" },
+                { "key": "image", "type": "file", "src": [] }
+              ]
+            },
+            "url": { "raw": "{{base_url}}/create-category", "host": ["{{base_url}}"], "path": ["create-category"] }
+          }
+        },
+        {
+          "name": "Categories - Get (Auth)",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "url": { "raw": "{{base_url}}/get-category", "host": ["{{base_url}}"], "path": ["get-category"] }
+          }
+        },
+        {
+          "name": "Admin Categories - Update",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "id", "value": "{{category_id}}", "type": "text" },
+                { "key": "categoryName", "value": "Updated Grains", "type": "text" },
+                { "key": "image", "type": "file", "src": [] }
+              ]
+            },
+            "url": { "raw": "{{base_url}}/update-category", "host": ["{{base_url}}"], "path": ["update-category"] }
+          }
+        },
+        {
+          "name": "Admin Categories - Delete",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"id\": \"{{category_id}}\"\n}" },
+            "url": { "raw": "{{base_url}}/delete-category", "host": ["{{base_url}}"], "path": ["delete-category"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Products",
+      "item": [
+        {
+          "name": "Admin Products - Create (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "productName", "value": "Organic Wheat", "type": "text" },
+                { "key": "description", "value": "Premium organic wheat", "type": "text" },
+                { "key": "price", "value": "2500", "type": "text" },
+                { "key": "stockQuantity", "value": "100", "type": "text" },
+                { "key": "unit", "value": "kg", "type": "text" },
+                { "key": "categoryId", "value": "{{category_id}}", "type": "text" },
+                { "key": "image", "type": "file", "src": [] }
+              ]
+            },
+            "url": { "raw": "{{base_url}}/create-product", "host": ["{{base_url}}"], "path": ["create-product"] }
+          }
+        },
+        {
+          "name": "Admin Products - Update",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"productId\": \"{{product_id}}\",\n  \"price\": 2600,\n  \"stockQuantity\": 120\n}" },
+            "url": { "raw": "{{base_url}}/update-product", "host": ["{{base_url}}"], "path": ["update-product"] }
+          }
+        },
+        {
+          "name": "Admin Products - Delete",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"productId\": \"{{product_id}}\"\n}" },
+            "url": { "raw": "{{base_url}}/delete-product", "host": ["{{base_url}}"], "path": ["delete-product"] }
+          }
+        },
+        {
+          "name": "Admin Products - Update Stock",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"productId\": \"{{product_id}}\",\n  \"stockQuantity\": 200,\n  \"operation\": \"set\"\n}" },
+            "url": { "raw": "{{base_url}}/update-stock", "host": ["{{base_url}}"], "path": ["update-stock"] }
+          }
+        },
+        {
+          "name": "Admin Products - Toggle Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"productId\": \"{{product_id}}\"\n}" },
+            "url": { "raw": "{{base_url}}/toggle-status", "host": ["{{base_url}}"], "path": ["toggle-status"] }
+          }
+        },
+        {
+          "name": "Admin Products - Toggle Featured",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"productId\": \"{{product_id}}\"\n}" },
+            "url": { "raw": "{{base_url}}/toggle-featured", "host": ["{{base_url}}"], "path": ["toggle-featured"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Dashboard",
+      "item": [
+        {
+          "name": "Dashboard - Get Counts",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "url": { "raw": "{{base_url}}/get-counts", "host": ["{{base_url}}"], "path": ["get-counts"] }
+          }
+        },
+        {
+          "name": "Dashboard - Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "url": { "raw": "{{base_url}}/get-allUser", "host": ["{{base_url}}"], "path": ["get-allUser"] }
+          }
+        }
+      ]
+    }
+  ]
+}
+
+

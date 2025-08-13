@@ -1,0 +1,1174 @@
+openapi: 3.0.0
+info:
+  title: Be-Endless API (Clean)
+  description: >-
+    Readable, accurate API collection for Be-Endless backend. Matches current
+    routes and request bodies.
+  version: 1.0.0
+servers:
+  - url: http://{{base_url}}
+tags:
+  - name: Authentication
+  - name: User Addresses
+  - name: Catalog (Public)
+  - name: Shopping Cart
+  - name: Orders
+  - name: Payments
+  - name: Notifications
+  - name: Admin - Categories
+  - name: Admin - Products
+  - name: Admin - Dashboard
+paths:
+  /signup:
+    post:
+      tags:
+        - Authentication
+      summary: Auth - Signup
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: >-
+                "{\n  \"fullName\": \"John Doe\",\n  \"email\":
+                \"john@example.com\",\n  \"password\": \"Secret123\",\n 
+                \"mobileNo\": \"9876543210\"\n}"
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /login:
+    post:
+      tags:
+        - Authentication
+      summary: Auth - Login
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: >-
+                "{\n  \"email\": \"john@example.com\",\n  \"password\":
+                \"Secret123\"\n}"
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /me:
+    post:
+      tags:
+        - Authentication
+      summary: Auth - Get Profile
+      requestBody:
+        content: {}
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /update-profile:
+    post:
+      tags:
+        - Authentication
+      summary: Auth - Update Profile
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: >-
+                "{\n  \"name\": \"John Updated\",\n  \"mobileNumber\":
+                \"9876543210\",\n  \"email\": \"john.updated@example.com\"\n}"
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /refresh/{refresh_token}:
+    get:
+      tags:
+        - Authentication
+      summary: Auth - Refresh Token
+      parameters:
+        - name: refresh_token
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /logout:
+    post:
+      tags:
+        - Authentication
+      summary: Auth - Logout
+      requestBody:
+        content: {}
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /user/addresses:
+    get:
+      tags:
+        - User Addresses
+      summary: Addresses - Get
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    put:
+      tags:
+        - User Addresses
+      summary: Addresses - Update Home/Work
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: >-
+                "{\n  \"homeAddress\": {\n    \"label\": \"Home\",\n   
+                \"street\": \"456 Home St\",\n    \"city\": \"Delhi\",\n   
+                \"state\": \"Delhi\",\n    \"postalCode\": \"110001\",\n   
+                \"country\": \"India\",\n    \"location\": { \"type\":
+                \"Point\", \"coordinates\": [77.2090, 28.6139] }\n  }\n}"
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /user/addresses/additional:
+    post:
+      tags:
+        - User Addresses
+      summary: Addresses - Add Additional
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: >-
+                "{\n  \"label\": \"Home\",\n  \"street\": \"123 Street\",\n 
+                \"city\": \"Mumbai\",\n  \"state\": \"Maharashtra\",\n 
+                \"postalCode\": \"400001\",\n  \"country\": \"India\",\n 
+                \"location\": { \n    \"type\": \"Point\", \n   
+                \"coordinates\": [72.8777, 19.0760]\n  }\n}"
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /user/addresses/additional/{address_id}:
+    patch:
+      tags:
+        - User Addresses
+      summary: Addresses - Update Additional
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: '"{\n  \"label\": \"Office\"\n}"'
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: address_id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    delete:
+      tags:
+        - User Addresses
+      summary: Addresses - Delete Additional
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: address_id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /product/{product_id}:
+    get:
+      tags:
+        - Catalog (Public)
+      summary: Product - Get by ID
+      parameters:
+        - name: product_id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /get-products:
+    post:
+      tags:
+        - Catalog (Public)
+      summary: Products - List (filters)
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: >-
+                "{\n  \"categoryId\": \"{{category_id}}\",\n  \"skip\": 0,\n 
+                \"limit\": 10,\n  \"minPrice\": 1000,\n  \"maxPrice\": 5000,\n 
+                \"sortBy\": \"price\",\n  \"sortOrder\": \"asc\",\n 
+                \"isFeatured\": true\n}"
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /get-Allproducts:
+    post:
+      tags:
+        - Catalog (Public)
+      summary: Products - All (simple list)
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: '"{\n  \"skip\": 0,\n  \"limit\": 20,\n  \"isActive\": true\n}"'
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /featured-products:
+    get:
+      tags:
+        - Catalog (Public)
+      summary: Products - Featured
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /search-products:
+    post:
+      tags:
+        - Catalog (Public)
+      summary: Products - Search
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: >-
+                "{\n  \"searchTerm\": \"wheat\",\n  \"skip\": 0,\n  \"limit\":
+                10\n}"
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /products/nearby:
+    post:
+      tags:
+        - Catalog (Public)
+      summary: Products - Nearby (requires auth)
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: >-
+                "{\n  \"latitude\": 19.0760,\n  \"longitude\": 72.8777,\n 
+                \"maxDistance\": 50000,\n  \"skip\": 0,\n  \"limit\": 10\n}"
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /add-toCart:
+    post:
+      tags:
+        - Shopping Cart
+      summary: Cart - Add Item
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: '"{\n  \"productId\": \"{{product_id}}\",\n  \"quantity\": 2\n}"'
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /get-cartItems:
+    get:
+      tags:
+        - Shopping Cart
+      summary: Cart - Get Items
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /update-cartItems:
+    post:
+      tags:
+        - Shopping Cart
+      summary: Cart - Update Item
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: '"{\n  \"id\": \"{{cart_id}}\",\n  \"quantity\": 3\n}"'
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /delete-cartItems:
+    post:
+      tags:
+        - Shopping Cart
+      summary: Cart - Delete Item
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: '"{\n  \"id\": \"{{cart_id}}\"\n}"'
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /get-cartDetailsByIds:
+    post:
+      tags:
+        - Shopping Cart
+      summary: Cart - Get Details By IDs
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: '"{\n  \"cartIds\": [\"{{cart_id}}\"]\n}"'
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /buy-product:
+    post:
+      tags:
+        - Orders
+      summary: Orders - Buy (from cart)
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: >-
+                "{\n  \"cartId\": [\"{{cart_id}}\"],\n  \"paymentAttemptId\":
+                \"{{payment_attempt_id}}\"\n}"
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /get-myOrders:
+    post:
+      tags:
+        - Orders
+      summary: Orders - My Orders
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: '"{\n  \"isSeller\": false\n}"'
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /update-order-status:
+    post:
+      tags:
+        - Orders
+      summary: Orders (Admin) - Update Status
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: '"{\n  \"orderId\": \"{{order_id}}\",\n  \"isSeller\": false\n}"'
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /get-paymentDetails:
+    get:
+      tags:
+        - Orders
+      summary: Orders - Payment Details
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /get-allOrders:
+    post:
+      tags:
+        - Orders
+      summary: Orders (Admin) - All Orders
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: '"{\n  \"skip\": 0,\n  \"limit\": 20\n}"'
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /admin/orders-with-payments:
+    get:
+      tags:
+        - Orders
+      summary: Orders (Admin) - With Payments
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /api/payments/create:
+    post:
+      tags:
+        - Payments
+      summary: Payments - Create Attempt (Cart)
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: >-
+                "{\n  \"amount\": 2400,\n  \"cartId\": [\"{{cart_id}}\"],\n 
+                \"paymentMethod\": \"COD\"\n}"
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /api/payments/update-status:
+    patch:
+      tags:
+        - Payments
+      summary: Payments - Update Status
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: >-
+                "{\n  \"paymentAttemptId\": \"{{payment_attempt_id}}\",\n 
+                \"status\": \"completed\"\n}"
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /api/payments/user:
+    get:
+      tags:
+        - Payments
+      summary: Payments - My Attempts
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /api/payments/{payment_attempt_id}:
+    get:
+      tags:
+        - Payments
+      summary: Payments - Get Attempt by ID
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: payment_attempt_id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /api/payments/{payment_attempt_id}/cancel:
+    patch:
+      tags:
+        - Payments
+      summary: Payments - Cancel Attempt
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: '"{}"'
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: payment_attempt_id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /api/payments/all:
+    get:
+      tags:
+        - Payments
+      summary: Payments (Admin) - All Attempts
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /get-notifications:
+    get:
+      tags:
+        - Notifications
+      summary: Notifications - Get
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /mark-notification-read:
+    post:
+      tags:
+        - Notifications
+      summary: Notifications - Mark Read
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: '"{\n  \"id\": \"{{notification_id}}\"\n}"'
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /create-category:
+    post:
+      tags:
+        - Admin - Categories
+      summary: Admin Categories - Create
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                categoryName:
+                  type: string
+                  example: Grains
+                bgColor:
+                  type: string
+                  example: '#FF6B6B'
+                image:
+                  type: string
+                  format: binary
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /get-category:
+    get:
+      tags:
+        - Admin - Categories
+      summary: Categories - Get (Auth)
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /update-category:
+    post:
+      tags:
+        - Admin - Categories
+      summary: Admin Categories - Update
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: '{{category_id}}'
+                categoryName:
+                  type: string
+                  example: Updated Grains
+                image:
+                  type: string
+                  format: binary
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /delete-category:
+    post:
+      tags:
+        - Admin - Categories
+      summary: Admin Categories - Delete
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: '"{\n  \"id\": \"{{category_id}}\"\n}"'
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /create-product:
+    post:
+      tags:
+        - Admin - Products
+      summary: Admin Products - Create (multipart)
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                productName:
+                  type: string
+                  example: Organic Wheat
+                description:
+                  type: string
+                  example: Premium organic wheat
+                price:
+                  type: integer
+                  example: '2500'
+                stockQuantity:
+                  type: integer
+                  example: '100'
+                unit:
+                  type: string
+                  example: kg
+                categoryId:
+                  type: string
+                  example: '{{category_id}}'
+                image:
+                  type: string
+                  format: binary
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /update-product:
+    put:
+      tags:
+        - Admin - Products
+      summary: Admin Products - Update
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: >-
+                "{\n  \"productId\": \"{{product_id}}\",\n  \"price\": 2600,\n 
+                \"stockQuantity\": 120\n}"
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /delete-product:
+    delete:
+      tags:
+        - Admin - Products
+      summary: Admin Products - Delete
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /update-stock:
+    patch:
+      tags:
+        - Admin - Products
+      summary: Admin Products - Update Stock
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: >-
+                "{\n  \"productId\": \"{{product_id}}\",\n  \"stockQuantity\":
+                200,\n  \"operation\": \"set\"\n}"
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /toggle-status:
+    patch:
+      tags:
+        - Admin - Products
+      summary: Admin Products - Toggle Status
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: '"{\n  \"productId\": \"{{product_id}}\"\n}"'
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /toggle-featured:
+    patch:
+      tags:
+        - Admin - Products
+      summary: Admin Products - Toggle Featured
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: '"{\n  \"productId\": \"{{product_id}}\"\n}"'
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /get-counts:
+    get:
+      tags:
+        - Admin - Dashboard
+      summary: Dashboard - Get Counts
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /get-allUser:
+    get:
+      tags:
+        - Admin - Dashboard
+      summary: Dashboard - Get All Users
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
