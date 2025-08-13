@@ -133,3 +133,6 @@ dist
 .pnp.*
 
 .vercel
+
+# Firebase service account keys (must never be committed)
+src/firebase/serviceAccountKeys.json
