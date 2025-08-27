@@ -50,8 +50,7 @@ describe("POST ==> /get-category", () => {
 
     // Fetch categories
     const response = await request(app)
-      .get("/get-category")
-      .set("Authorization", `Bearer ${jwtToken}`);
+      .get("/get-category");
 
     // Assert
     expect(response.statusCode).toBe(200);
@@ -71,8 +70,7 @@ describe("POST ==> /get-category", () => {
   it("should return an empty array if no categories found", async () => {
     // Fetch categories (assuming no categories are created)
     const response = await request(app)
-      .get("/get-category")
-      .set("Authorization", `Bearer ${jwtToken}`);
+      .get("/get-category");
 
     // Assert
     expect(response.statusCode).toBe(200);

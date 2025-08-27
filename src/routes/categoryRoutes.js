@@ -18,7 +18,7 @@ const fileUpload = multer();
 router.post("/create-category", [isAuthenticated, isAdmin, fileUpload.single('image')], createCategory);
 
 // <!-- ====== get category route ====== -->
-router.get("/get-category", isAuthenticated, getCategory);
+router.get("/get-category", getCategory);
 
 // <!-- ====== update category route (admin only) ====== -->
 router.post("/update-category", [isAuthenticated, isAdmin, fileUpload.single('image')], updateCategory);

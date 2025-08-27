@@ -10,7 +10,7 @@ servers:
 tags:
   - name: Authentication
   - name: User Addresses
-  - name: Catalog (Public)
+  - name: Catalog (Public - No Auth Required)
   - name: Shopping Cart
   - name: Orders
   - name: Payments
@@ -283,7 +283,7 @@ paths:
   /product/{product_id}:
     get:
       tags:
-        - Catalog (Public)
+        - Catalog (Public - No Auth Required)
       summary: Product - Get by ID
       parameters:
         - name: product_id
@@ -299,7 +299,7 @@ paths:
   /get-products:
     post:
       tags:
-        - Catalog (Public)
+        - Catalog (Public - No Auth Required)
       summary: Products - List (filters)
       requestBody:
         content:
@@ -325,7 +325,7 @@ paths:
   /get-Allproducts:
     post:
       tags:
-        - Catalog (Public)
+        - Catalog (Public - No Auth Required)
       summary: Products - All (simple list)
       requestBody:
         content:
@@ -347,7 +347,7 @@ paths:
   /featured-products:
     get:
       tags:
-        - Catalog (Public)
+        - Catalog (Public - No Auth Required)
       summary: Products - Featured
       responses:
         '200':
@@ -357,7 +357,7 @@ paths:
   /search-products:
     post:
       tags:
-        - Catalog (Public)
+        - Catalog (Public - No Auth Required)
       summary: Products - Search
       requestBody:
         content:
@@ -381,7 +381,7 @@ paths:
   /products/nearby:
     post:
       tags:
-        - Catalog (Public)
+        - Catalog (Public - No Auth Required)
       summary: Products - Nearby (requires auth)
       requestBody:
         content:
@@ -894,13 +894,7 @@ paths:
     get:
       tags:
         - Admin - Categories
-      summary: Categories - Get (Auth)
-      parameters:
-        - name: Authorization
-          in: header
-          schema:
-            type: string
-          example: Bearer {{access_token}}
+      summary: Categories - Get (Public)
       responses:
         '200':
           description: Successful response
