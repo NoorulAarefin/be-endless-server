@@ -72,7 +72,7 @@ export const createProduct = async (req, res, next) => {
           value: Joi.string().required(),
           price: Joi.number().min(0),
           stockQuantity: Joi.number().min(0),
-          image: Joi.string(),
+          image: Joi.string().allow(''), // Allow empty string or URL or file: prefix
           isActive: Joi.boolean()
         }))
       }))
@@ -86,17 +86,18 @@ export const createProduct = async (req, res, next) => {
     const { image, ...productData } = req.body;
 
     let cloudinaryResults = [];
+    let variantImageResults = [];
 
-    // Handle image upload - either from files or URLs
-    if (req.files && req.files.length > 0) {
-      // Upload files to Cloudinary
+    // Handle main product image upload - either from files or URLs
+    if (req.files && req.files.image && req.files.image.length > 0) {
+      // Upload main product image files to Cloudinary
       try {
-        const uploadPromises = req.files.map(file => uploadToCloudinary(file));
+        const uploadPromises = req.files.image.map(file => uploadToCloudinary(file));
         cloudinaryResults = await Promise.all(uploadPromises);
       } catch (uploadError) {
-        logger.error("Cloudinary upload error:", uploadError);
+        logger.error("Cloudinary upload error for main images:", uploadError);
         return res.status(500).json({
-          message: "Failed to upload images to Cloudinary",
+          message: "Failed to upload main product images to Cloudinary",
           success: false,
         });
       }
@@ -111,7 +112,7 @@ export const createProduct = async (req, res, next) => {
         );
         cloudinaryResults = await Promise.all(uploadPromises);
       } catch (uploadError) {
-        logger.error("Cloudinary upload error:", uploadError);
+        logger.error("Cloudinary upload error for image URLs:", uploadError);
         return res.status(500).json({
           message: "Failed to upload image URLs to Cloudinary",
           success: false,
@@ -119,18 +120,66 @@ export const createProduct = async (req, res, next) => {
       }
     } else {
       return res.status(400).json({
-        message: "Either image files or image URLs are required",
+        message: "Either image files or image URLs are required for main product images",
         success: false,
       });
     }
 
+    // Handle variant image uploads
+    if (req.files && req.files.variantImages && req.files.variantImages.length > 0) {
+      // Validate variant image count
+      if (req.files.variantImages.length > 8) {
+        return res.status(400).json({
+          success: false,
+          message: "Too many variant images. Maximum allowed is 8 variant images."
+        });
+      }
+      
+      try {
+        const uploadPromises = req.files.variantImages.map(file => uploadToCloudinary(file));
+        variantImageResults = await Promise.all(uploadPromises);
+      } catch (uploadError) {
+        logger.error("Cloudinary upload error for variant images:", uploadError);
+        return res.status(500).json({
+          message: "Failed to upload variant images to Cloudinary",
+          success: false,
+        });
+      }
+    }
+
     // Extract image URLs from Cloudinary results
     const imageUrls = cloudinaryResults.map(result => result.secure_url);
+    const variantImageUrls = variantImageResults.map(result => result.secure_url);
 
     const finalProductData = {
       ...productData,
-      image: imageUrls, // Use Cloudinary URLs
+      image: imageUrls, // Use Cloudinary URLs for main product images
     };
+
+    // Process variants and assign uploaded images
+    if (finalProductData.variants && finalProductData.variants.length > 0) {
+      let variantImageIndex = 0;
+      
+      finalProductData.variants = finalProductData.variants.map(variant => ({
+        ...variant,
+        options: variant.options.map(option => {
+          const processedOption = { ...option };
+          
+          // If option has an image file uploaded, use the uploaded image URL
+          if (option.image && option.image.startsWith('file:')) {
+            if (variantImageIndex < variantImageUrls.length) {
+              processedOption.image = variantImageUrls[variantImageIndex];
+              variantImageIndex++;
+            } else {
+              // If no more uploaded images, keep the original URL or remove image
+              processedOption.image = option.image.replace('file:', '');
+            }
+          }
+          
+          return processedOption;
+        })
+      }));
+    }
     
     // Calculate discount percentage if original price is provided
     if (finalProductData.originalPrice && finalProductData.price) {
@@ -353,7 +402,7 @@ export const updateProduct = async (req, res, next) => {
           value: Joi.string().required(),
           price: Joi.number().min(0),
           stockQuantity: Joi.number().min(0),
-          image: Joi.string(),
+          image: Joi.string().allow(''), // Allow empty string or URL or file: prefix
           isActive: Joi.boolean()
         }))
       }))
@@ -366,18 +415,21 @@ export const updateProduct = async (req, res, next) => {
 
     const { productId, image, ...updateData } = req.body;
 
-    // Handle image upload - either from files or URLs
-    if (req.files && req.files.length > 0) {
-      // Upload new files to Cloudinary
+    let cloudinaryResults = [];
+    let variantImageResults = [];
+
+    // Handle main product image upload - either from files or URLs
+    if (req.files && req.files.image && req.files.image.length > 0) {
+      // Upload main product image files to Cloudinary
       try {
-        const uploadPromises = req.files.map(file => uploadToCloudinary(file));
-        const cloudinaryResults = await Promise.all(uploadPromises);
+        const uploadPromises = req.files.image.map(file => uploadToCloudinary(file));
+        cloudinaryResults = await Promise.all(uploadPromises);
         const imageUrls = cloudinaryResults.map(result => result.secure_url);
         updateData.image = imageUrls;
       } catch (uploadError) {
-        logger.error("Cloudinary upload error:", uploadError);
+        logger.error("Cloudinary upload error for main images:", uploadError);
         return res.status(500).json({
-          message: "Failed to upload images to Cloudinary",
+          message: "Failed to upload main product images to Cloudinary",
           success: false,
         });
       }
@@ -390,16 +442,64 @@ export const updateProduct = async (req, res, next) => {
             resource_type: "auto",
           })
         );
-        const cloudinaryResults = await Promise.all(uploadPromises);
+        cloudinaryResults = await Promise.all(uploadPromises);
         const imageUrls = cloudinaryResults.map(result => result.secure_url);
         updateData.image = imageUrls;
       } catch (uploadError) {
-        logger.error("Cloudinary upload error:", uploadError);
+        logger.error("Cloudinary upload error for image URLs:", uploadError);
         return res.status(500).json({
           message: "Failed to upload image URLs to Cloudinary",
           success: false,
         });
       }
+    }
+
+    // Handle variant image uploads
+    if (req.files && req.files.variantImages && req.files.variantImages.length > 0) {
+      // Validate variant image count
+      if (req.files.variantImages.length > 8) {
+        return res.status(400).json({
+          success: false,
+          message: "Too many variant images. Maximum allowed is 8 variant images."
+        });
+      }
+      
+      try {
+        const uploadPromises = req.files.variantImages.map(file => uploadToCloudinary(file));
+        variantImageResults = await Promise.all(uploadPromises);
+      } catch (uploadError) {
+        logger.error("Cloudinary upload error for variant images:", uploadError);
+        return res.status(500).json({
+          message: "Failed to upload variant images to Cloudinary",
+          success: false,
+        });
+      }
+    }
+
+    // Process variants and assign uploaded images
+    if (updateData.variants && updateData.variants.length > 0) {
+      const variantImageUrls = variantImageResults.map(result => result.secure_url);
+      let variantImageIndex = 0;
+      
+      updateData.variants = updateData.variants.map(variant => ({
+        ...variant,
+        options: variant.options.map(option => {
+          const processedOption = { ...option };
+          
+          // If option has an image file uploaded, use the uploaded image URL
+          if (option.image && option.image.startsWith('file:')) {
+            if (variantImageIndex < variantImageUrls.length) {
+              processedOption.image = variantImageUrls[variantImageIndex];
+              variantImageIndex++;
+            } else {
+              // If no more uploaded images, keep the original URL or remove image
+              processedOption.image = option.image.replace('file:', '');
+            }
+          }
+          
+          return processedOption;
+        })
+      }));
     }
 
     // Calculate discount percentage if original price is provided

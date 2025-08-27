@@ -2,6 +2,31 @@ import express from "express";
 import multer from "multer";
 import { isAdmin, isAuthenticated } from "../middlewares/auth.js";
 
+// Custom error handler for multer file upload limits
+const handleMulterErrors = (err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'LIMIT_FILE_COUNT') {
+      return res.status(400).json({
+        success: false,
+        message: "Too many files uploaded. Maximum allowed: 10 main product images and 8 variant images."
+      });
+    }
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({
+        success: false,
+        message: "File size too large. Please upload smaller images."
+      });
+    }
+    if (err.code === 'LIMIT_UNEXPECTED_FILE') {
+      return res.status(400).json({
+        success: false,
+        message: "Unexpected file field. Please use 'image' for main product images and 'variantImages' for variant images."
+      });
+    }
+  }
+  next(err);
+};
+
 import {
   createProduct,
   deleteProduct,
@@ -25,7 +50,10 @@ const fileUpload = multer();
 const router = express.Router();
 
 // <!-- ====== admin side - add new product route ====== -->
-router.post("/create-product", [isAuthenticated, isAdmin, fileUpload.array("image", 10)], createProduct);
+router.post("/create-product", [isAuthenticated, isAdmin, fileUpload.fields([
+  { name: 'image', maxCount: 10 },
+  { name: 'variantImages', maxCount: 8 } // Allow up to 8 variant images
+]), handleMulterErrors], createProduct);
 
 // <!-- ====== get product by ID route ====== -->
 router.get("/product/:productId", getProductById);
@@ -40,7 +68,10 @@ router.post("/get-Allproducts", getAllProducts);
 router.get("/featured-products", getFeaturedProducts);
 
 // <!-- ====== update product route (admin only) ====== -->
-router.put("/update-product", [isAuthenticated, isAdmin, fileUpload.array("image", 10)], updateProduct);
+router.put("/update-product", [isAuthenticated, isAdmin, fileUpload.fields([
+  { name: 'image', maxCount: 10 },
+  { name: 'variantImages', maxCount: 8 } // Allow up to 8 variant images
+]), handleMulterErrors], updateProduct);
 
 // <!-- ====== delete product route (admin only) ====== -->
 router.delete("/delete-product", [isAuthenticated, isAdmin], deleteProduct);
