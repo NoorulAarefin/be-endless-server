@@ -63,6 +63,7 @@ export const createProduct = async (req, res, next) => {
         stockQuantity: Joi.number().min(0).required()
       })),
       isFeatured: Joi.boolean(),
+      isActive: Joi.boolean(),
       tags: Joi.array().items(Joi.string()),
       specifications: Joi.object(),
       productType: Joi.string().valid('simple', 'variable'),
@@ -393,6 +394,7 @@ export const updateProduct = async (req, res, next) => {
         stockQuantity: Joi.number().min(0).required()
       })),
       isFeatured: Joi.boolean(),
+      isActive: Joi.boolean(),
       tags: Joi.array().items(Joi.string()),
       specifications: Joi.object(),
       productType: Joi.string().valid('simple', 'variable'),
