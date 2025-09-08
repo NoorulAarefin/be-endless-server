@@ -11,6 +11,7 @@ tags:
   - name: Authentication
   - name: User Addresses
   - name: Catalog (Public - No Auth Required)
+  - name: Hero Banners
   - name: Shopping Cart
   - name: Orders
   - name: Payments
@@ -391,6 +392,74 @@ paths:
               example: >-
                 "{\n  \"latitude\": 19.0760,\n  \"longitude\": 72.8777,\n 
                 \"maxDistance\": 50000,\n  \"skip\": 0,\n  \"limit\": 10\n}"
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /hero-banners:
+    post:
+      tags:
+        - Hero Banners
+      summary: Hero Banners - Create or Update
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: >-
+                "{\n  \"bannerId\": \"optional-string\",\n  \"imageUrl\":
+                \"https://example.com/hero.jpg\",\n  \"heading\": \"Big
+                Sale\",\n  \"subheading\": \"Up to 50% off\",\n  \"ctaText\":
+                \"Shop Now\",\n  \"ctaUrl\": \"https://example.com/shop\",\n 
+                \"sortOrder\": 1,\n  \"isActive\": true\n}"
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    get:
+      tags:
+        - Hero Banners
+      summary: Hero Banners - List (Public)
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /hero-banners/toggle:
+    post:
+      tags:
+        - Hero Banners
+      summary: Hero Banners - Toggle Active
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: '"{\n  \"bannerId\": \"{{banner_id}}\",\n  \"isActive\": true\n}"'
       parameters:
         - name: Authorization
           in: header
@@ -987,6 +1056,12 @@ paths:
                 categoryId:
                   type: string
                   example: '{{category_id}}'
+                isFeatured:
+                  type: boolean
+                  example: 'true'
+                isActive:
+                  type: boolean
+                  example: 'true'
                 image:
                   type: string
                   format: binary
@@ -1013,7 +1088,8 @@ paths:
               type: string
               example: >-
                 "{\n  \"productId\": \"{{product_id}}\",\n  \"price\": 2600,\n 
-                \"stockQuantity\": 120\n}"
+                \"stockQuantity\": 120,\n  \"isFeatured\": false,\n 
+                \"isActive\": true\n}"
       parameters:
         - name: Authorization
           in: header
