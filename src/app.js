@@ -12,6 +12,7 @@ import buyRoutes from "./routes/buyRoutes.js";
 // import chatRoutes from "./routes/chatRoute.js"; // TEMPORARILY DISABLED - Chat functionality not required
 import notification from "./routes/notificationRoute.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
+import heroBannerRoutes from "./routes/heroBannerRoutes.js";
 
 import postmanToOpenApi from "postman-to-openapi";
 import YAML from "yamljs";
@@ -35,6 +36,7 @@ app.use(buyRoutes);
 // app.use(chatRoutes); // TEMPORARILY DISABLED - Chat functionality not required
 app.use(notification);
 app.use("/api/payments", paymentRoutes);
+app.use(heroBannerRoutes);
 
 //swagger Documentation
 try {

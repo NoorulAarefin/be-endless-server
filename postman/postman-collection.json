@@ -185,6 +185,42 @@
       ]
     },
     {
+      "name": "Hero Banners",
+      "item": [
+        {
+          "name": "Hero Banners - Create or Update",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"bannerId\": \"optional-string\",\n  \"imageUrl\": \"https://example.com/hero.jpg\",\n  \"heading\": \"Big Sale\",\n  \"subheading\": \"Up to 50% off\",\n  \"ctaText\": \"Shop Now\",\n  \"ctaUrl\": \"https://example.com/shop\",\n  \"sortOrder\": 1,\n  \"isActive\": true\n}" },
+            "url": { "raw": "{{base_url}}/hero-banners", "host": ["{{base_url}}"], "path": ["hero-banners"] }
+          }
+        },
+        {
+          "name": "Hero Banners - List (Public)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/hero-banners", "host": ["{{base_url}}"], "path": ["hero-banners"] }
+          }
+        },
+        {
+          "name": "Hero Banners - Toggle Active",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"bannerId\": \"{{banner_id}}\",\n  \"isActive\": true\n}" },
+            "url": { "raw": "{{base_url}}/hero-banners/toggle", "host": ["{{base_url}}"], "path": ["hero-banners", "toggle"] }
+          }
+        }
+      ]
+    },
+    {
       "name": "Shopping Cart",
       "item": [
         {
@@ -477,6 +513,8 @@
                 { "key": "stockQuantity", "value": "100", "type": "text" },
                 { "key": "unit", "value": "kg", "type": "text" },
                 { "key": "categoryId", "value": "{{category_id}}", "type": "text" },
+                { "key": "isFeatured", "value": "true", "type": "text" },
+                { "key": "isActive", "value": "true", "type": "text" },
                 { "key": "image", "type": "file", "src": [] }
               ]
             },
@@ -491,7 +529,7 @@
               { "key": "Authorization", "value": "Bearer {{access_token}}" },
               { "key": "Content-Type", "value": "application/json" }
             ],
-            "body": { "mode": "raw", "raw": "{\n  \"productId\": \"{{product_id}}\",\n  \"price\": 2600,\n  \"stockQuantity\": 120\n}" },
+            "body": { "mode": "raw", "raw": "{\n  \"productId\": \"{{product_id}}\",\n  \"price\": 2600,\n  \"stockQuantity\": 120,\n  \"isFeatured\": false,\n  \"isActive\": true\n}" },
             "url": { "raw": "{{base_url}}/update-product", "host": ["{{base_url}}"], "path": ["update-product"] }
           }
         },
