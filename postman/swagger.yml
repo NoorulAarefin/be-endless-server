@@ -9,6 +9,7 @@ servers:
   - url: http://{{base_url}}
 tags:
   - name: Authentication
+  - name: Admin - Inventory
   - name: User Addresses
   - name: Catalog (Public - No Auth Required)
   - name: Hero Banners
@@ -19,6 +20,7 @@ tags:
   - name: Admin - Categories
   - name: Admin - Products
   - name: Admin - Dashboard
+  - name: Admin - Dashboard (Summary)
 paths:
   /signup:
     post:
@@ -150,6 +152,37 @@ paths:
           description: Successful response
           content:
             application/json: {}
+  /admin/low-stock:
+    get:
+      tags:
+        - Admin - Inventory
+      summary: Low Stock - List
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: threshold
+          in: query
+          schema:
+            type: integer
+          example: '10'
+        - name: skip
+          in: query
+          schema:
+            type: integer
+          example: '0'
+        - name: limit
+          in: query
+          schema:
+            type: integer
+          example: '20'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
   /user/addresses:
     get:
       tags:
@@ -179,8 +212,7 @@ paths:
                 "{\n  \"homeAddress\": {\n    \"label\": \"Home\",\n   
                 \"street\": \"456 Home St\",\n    \"city\": \"Delhi\",\n   
                 \"state\": \"Delhi\",\n    \"postalCode\": \"110001\",\n   
-                \"country\": \"India\",\n    \"location\": { \"type\":
-                \"Point\", \"coordinates\": [77.2090, 28.6139] }\n  }\n}"
+                \"country\": \"India\"\n  }\n}"
       parameters:
         - name: Authorization
           in: header
@@ -210,9 +242,7 @@ paths:
               example: >-
                 "{\n  \"label\": \"Home\",\n  \"street\": \"123 Street\",\n 
                 \"city\": \"Mumbai\",\n  \"state\": \"Maharashtra\",\n 
-                \"postalCode\": \"400001\",\n  \"country\": \"India\",\n 
-                \"location\": { \n    \"type\": \"Point\", \n   
-                \"coordinates\": [72.8777, 19.0760]\n  }\n}"
+                \"postalCode\": \"400001\",\n  \"country\": \"India\"\n}"
       parameters:
         - name: Authorization
           in: header
@@ -412,29 +442,43 @@ paths:
     post:
       tags:
         - Hero Banners
-      summary: Hero Banners - Create or Update
+      summary: Hero Banners - Create or Update (File Upload)
       requestBody:
         content:
-          '*/*':
+          multipart/form-data:
             schema:
-              type: string
-              example: >-
-                "{\n  \"bannerId\": \"optional-string\",\n  \"imageUrl\":
-                \"https://example.com/hero.jpg\",\n  \"heading\": \"Big
-                Sale\",\n  \"subheading\": \"Up to 50% off\",\n  \"ctaText\":
-                \"Shop Now\",\n  \"ctaUrl\": \"https://example.com/shop\",\n 
-                \"sortOrder\": 1,\n  \"isActive\": true\n}"
+              type: object
+              properties:
+                bannerId:
+                  type: string
+                  example: optional-string
+                heading:
+                  type: string
+                  example: Big Sale
+                subheading:
+                  type: string
+                  example: Up to 50% off
+                ctaText:
+                  type: string
+                  example: Shop Now
+                ctaUrl:
+                  type: string
+                  example: https://example.com/shop
+                sortOrder:
+                  type: integer
+                  example: '1'
+                isActive:
+                  type: boolean
+                  example: 'true'
+                image:
+                  type: string
+                  format: binary
       parameters:
         - name: Authorization
           in: header
           schema:
             type: string
           example: Bearer {{access_token}}
-        - name: Content-Type
-          in: header
-          schema:
-            type: string
-          example: application/json
       responses:
         '200':
           description: Successful response
@@ -460,6 +504,33 @@ paths:
             schema:
               type: string
               example: '"{\n  \"bannerId\": \"{{banner_id}}\",\n  \"isActive\": true\n}"'
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /hero-banners/delete:
+    post:
+      tags:
+        - Hero Banners
+      summary: Hero Banners - Delete
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              example: '"{\n  \"bannerId\": \"{{banner_id}}\"\n}"'
       parameters:
         - name: Authorization
           in: header
@@ -1210,11 +1281,11 @@ paths:
           description: Successful response
           content:
             application/json: {}
-  /get-counts:
+  /admin/dashboard/stats:
     get:
       tags:
         - Admin - Dashboard
-      summary: Dashboard - Get Counts
+      summary: Dashboard - Overview Stats
       parameters:
         - name: Authorization
           in: header
@@ -1226,17 +1297,232 @@ paths:
           description: Successful response
           content:
             application/json: {}
-  /get-allUser:
+  /admin/dashboard/recent-orders:
     get:
       tags:
         - Admin - Dashboard
-      summary: Dashboard - Get All Users
+      summary: Dashboard - Recent Orders
       parameters:
         - name: Authorization
           in: header
           schema:
             type: string
           example: Bearer {{access_token}}
+        - name: limit
+          in: query
+          schema:
+            type: integer
+          example: '10'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /admin/dashboard/recent-products:
+    get:
+      tags:
+        - Admin - Dashboard
+      summary: Dashboard - Recent Products
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: limit
+          in: query
+          schema:
+            type: integer
+          example: '10'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /admin/dashboard/trending-products:
+    get:
+      tags:
+        - Admin - Dashboard
+      summary: Dashboard - Trending Products
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: limit
+          in: query
+          schema:
+            type: integer
+          example: '10'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /admin/dashboard/sales-analytics:
+    get:
+      tags:
+        - Admin - Dashboard
+      summary: Dashboard - Sales Analytics (Daily)
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: period
+          in: query
+          schema:
+            type: string
+          example: daily
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /admin/dashboard/user-analytics:
+    get:
+      tags:
+        - Admin - Dashboard
+      summary: Dashboard - User Analytics
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: period
+          in: query
+          schema:
+            type: string
+          example: monthly
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /admin/dashboard/product-analytics:
+    get:
+      tags:
+        - Admin - Dashboard
+      summary: Dashboard - Product Analytics
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /admin/dashboard/order-analytics:
+    get:
+      tags:
+        - Admin - Dashboard
+      summary: Dashboard - Order Analytics
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /admin/dashboard/revenue-analytics:
+    get:
+      tags:
+        - Admin - Dashboard
+      summary: Dashboard - Revenue Analytics
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: period
+          in: query
+          schema:
+            type: string
+          example: monthly
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /admin/dashboard/top-categories:
+    get:
+      tags:
+        - Admin - Dashboard
+      summary: Dashboard - Top Selling Categories
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: limit
+          in: query
+          schema:
+            type: integer
+          example: '5'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /admin/dashboard/charts:
+    get:
+      tags:
+        - Admin - Dashboard
+      summary: Dashboard - All Charts Data
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /admin/dashboard/summary:
+    get:
+      tags:
+        - Admin - Dashboard (Summary)
+      summary: Dashboard - Summary (Stats + Charts + Recent)
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: period
+          in: query
+          schema:
+            type: string
+          example: monthly
+        - name: recentLimit
+          in: query
+          schema:
+            type: integer
+          example: '10'
+        - name: topCategoriesLimit
+          in: query
+          schema:
+            type: integer
+          example: '5'
+        - name: lowStockThreshold
+          in: query
+          schema:
+            type: integer
+          example: '10'
       responses:
         '200':
           description: Successful response

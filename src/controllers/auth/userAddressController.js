@@ -31,13 +31,8 @@ export const addAdditionalAddress = async (req, res, next) => {
     state: "",
     postalCode: "",
     country: "",
-    location: undefined,
   };
   const Joi = (await import("joi")).default;
-  const locationSchema = Joi.object({
-    type: Joi.string().valid("Point").required(),
-    coordinates: Joi.array().items(Joi.number()).length(2).required(),
-  });
   const schema = Joi.object({
     label: Joi.string().default("Other"),
     street: Joi.string().allow(""),
@@ -45,7 +40,6 @@ export const addAdditionalAddress = async (req, res, next) => {
     state: Joi.string().allow(""),
     postalCode: Joi.string().allow(""),
     country: Joi.string().allow(""),
-    location: locationSchema.required(),
   });
   const { error, value } = schema.validate(req.body);
   if (error) {
@@ -68,10 +62,6 @@ export const addAdditionalAddress = async (req, res, next) => {
 // PUT /user/addresses
 export const updateUserAddresses = async (req, res, next) => {
   const Joi = (await import("joi")).default;
-  const locationSchema = Joi.object({
-    type: Joi.string().valid("Point").required(),
-    coordinates: Joi.array().items(Joi.number()).length(2).required(),
-  });
   const addressSchema = Joi.object({
     label: Joi.string().default("Other"),
     street: Joi.string().allow(""),
@@ -79,7 +69,6 @@ export const updateUserAddresses = async (req, res, next) => {
     state: Joi.string().allow(""),
     postalCode: Joi.string().allow(""),
     country: Joi.string().allow(""),
-    location: locationSchema.required(),
   });
   const schema = Joi.object({
     homeAddress: addressSchema.optional(),
@@ -111,10 +100,6 @@ export const updateUserAddresses = async (req, res, next) => {
 // PATCH /user/addresses/additional/:id
 export const updateAdditionalAddress = async (req, res, next) => {
   const Joi = (await import("joi")).default;
-  const locationSchema = Joi.object({
-    type: Joi.string().valid("Point").required(),
-    coordinates: Joi.array().items(Joi.number()).length(2).required(),
-  });
   const addressSchema = Joi.object({
     label: Joi.string().default("Other"),
     street: Joi.string().allow(""),
@@ -122,7 +107,6 @@ export const updateAdditionalAddress = async (req, res, next) => {
     state: Joi.string().allow(""),
     postalCode: Joi.string().allow(""),
     country: Joi.string().allow(""),
-    location: locationSchema.optional(),
   });
   const { error, value } = addressSchema.validate(req.body);
   if (error) {

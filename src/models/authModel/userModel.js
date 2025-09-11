@@ -55,15 +55,6 @@ const userShema = new mongoose.Schema(
       state: { type: String },
       postalCode: { type: String },
       country: { type: String },
-      location: {
-        type: {
-          type: String,
-          enum: ["Point"]
-        },
-        coordinates: {
-          type: [Number] // [longitude, latitude]
-        }
-      }
     },
     workAddress: {
       label: { type: String },
@@ -72,15 +63,6 @@ const userShema = new mongoose.Schema(
       state: { type: String },
       postalCode: { type: String },
       country: { type: String },
-      location: {
-        type: {
-          type: String,
-          enum: ["Point"]
-        },
-        coordinates: {
-          type: [Number] // [longitude, latitude]
-        }
-      }
     },
     additionalAddresses: [
       {
@@ -90,24 +72,12 @@ const userShema = new mongoose.Schema(
         state: { type: String },
         postalCode: { type: String },
         country: { type: String },
-        location: {
-          type: {
-            type: String,
-            enum: ["Point"]
-          },
-          coordinates: {
-            type: [Number] // [longitude, latitude]
-          }
-        }
       }
     ],
   },
   { timestamps: true },
 );
 
-// Add 2dsphere indexes for geospatial queries on addresses
-userShema.index({ 'homeAddress.location': '2dsphere' });
-userShema.index({ 'workAddress.location': '2dsphere' });
-userShema.index({ 'additionalAddresses.location': '2dsphere' });
+// Geospatial indexes removed as addresses are simplified to basic fields
 
 export const User = mongoose.model("User", userShema);

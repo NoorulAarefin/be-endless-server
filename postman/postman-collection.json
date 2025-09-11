@@ -70,6 +70,28 @@
       ]
     },
     {
+      "name": "Admin - Inventory",
+      "item": [
+        {
+          "name": "Low Stock - List",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "url": {
+              "raw": "{{base_url}}/admin/low-stock?threshold=10&skip=0&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "low-stock"],
+              "query": [
+                { "key": "threshold", "value": "10" },
+                { "key": "skip", "value": "0" },
+                { "key": "limit", "value": "20" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "User Addresses",
       "item": [
         {
@@ -88,7 +110,7 @@
               { "key": "Authorization", "value": "Bearer {{access_token}}" },
               { "key": "Content-Type", "value": "application/json" }
             ],
-            "body": { "mode": "raw", "raw": "{\n  \"label\": \"Home\",\n  \"street\": \"123 Street\",\n  \"city\": \"Mumbai\",\n  \"state\": \"Maharashtra\",\n  \"postalCode\": \"400001\",\n  \"country\": \"India\",\n  \"location\": { \n    \"type\": \"Point\", \n    \"coordinates\": [72.8777, 19.0760]\n  }\n}" },
+            "body": { "mode": "raw", "raw": "{\n  \"label\": \"Home\",\n  \"street\": \"123 Street\",\n  \"city\": \"Mumbai\",\n  \"state\": \"Maharashtra\",\n  \"postalCode\": \"400001\",\n  \"country\": \"India\"\n}" },
             "url": { "raw": "{{base_url}}/user/addresses/additional", "host": ["{{base_url}}"], "path": ["user", "addresses", "additional"] }
           }
         },
@@ -100,7 +122,7 @@
               { "key": "Authorization", "value": "Bearer {{access_token}}" },
               { "key": "Content-Type", "value": "application/json" }
             ],
-            "body": { "mode": "raw", "raw": "{\n  \"homeAddress\": {\n    \"label\": \"Home\",\n    \"street\": \"456 Home St\",\n    \"city\": \"Delhi\",\n    \"state\": \"Delhi\",\n    \"postalCode\": \"110001\",\n    \"country\": \"India\",\n    \"location\": { \"type\": \"Point\", \"coordinates\": [77.2090, 28.6139] }\n  }\n}" },
+            "body": { "mode": "raw", "raw": "{\n  \"homeAddress\": {\n    \"label\": \"Home\",\n    \"street\": \"456 Home St\",\n    \"city\": \"Delhi\",\n    \"state\": \"Delhi\",\n    \"postalCode\": \"110001\",\n    \"country\": \"India\"\n  }\n}" },
             "url": { "raw": "{{base_url}}/user/addresses", "host": ["{{base_url}}"], "path": ["user", "addresses"] }
           }
         },
@@ -188,7 +210,7 @@
       "name": "Hero Banners",
       "item": [
         {
-          "name": "Hero Banners - Create or Update",
+          "name": "Hero Banners - Create or Update (JSON)",
           "request": {
             "method": "POST",
             "header": [
@@ -196,6 +218,27 @@
               { "key": "Content-Type", "value": "application/json" }
             ],
             "body": { "mode": "raw", "raw": "{\n  \"bannerId\": \"optional-string\",\n  \"imageUrl\": \"https://example.com/hero.jpg\",\n  \"heading\": \"Big Sale\",\n  \"subheading\": \"Up to 50% off\",\n  \"ctaText\": \"Shop Now\",\n  \"ctaUrl\": \"https://example.com/shop\",\n  \"sortOrder\": 1,\n  \"isActive\": true\n}" },
+            "url": { "raw": "{{base_url}}/hero-banners", "host": ["{{base_url}}"], "path": ["hero-banners"] }
+          }
+        },
+        {
+          "name": "Hero Banners - Create or Update (File Upload)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "bannerId", "value": "optional-string", "type": "text" },
+                { "key": "heading", "value": "Big Sale", "type": "text" },
+                { "key": "subheading", "value": "Up to 50% off", "type": "text" },
+                { "key": "ctaText", "value": "Shop Now", "type": "text" },
+                { "key": "ctaUrl", "value": "https://example.com/shop", "type": "text" },
+                { "key": "sortOrder", "value": "1", "type": "text" },
+                { "key": "isActive", "value": "true", "type": "text" },
+                { "key": "image", "type": "file", "src": [] }
+              ]
+            },
             "url": { "raw": "{{base_url}}/hero-banners", "host": ["{{base_url}}"], "path": ["hero-banners"] }
           }
         },
@@ -216,6 +259,18 @@
             ],
             "body": { "mode": "raw", "raw": "{\n  \"bannerId\": \"{{banner_id}}\",\n  \"isActive\": true\n}" },
             "url": { "raw": "{{base_url}}/hero-banners/toggle", "host": ["{{base_url}}"], "path": ["hero-banners", "toggle"] }
+          }
+        },
+        {
+          "name": "Hero Banners - Delete",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"bannerId\": \"{{banner_id}}\"\n}" },
+            "url": { "raw": "{{base_url}}/hero-banners/delete", "host": ["{{base_url}}"], "path": ["hero-banners", "delete"] }
           }
         }
       ]
@@ -587,19 +642,130 @@
       "name": "Admin - Dashboard",
       "item": [
         {
-          "name": "Dashboard - Get Counts",
+          "name": "Dashboard - Overview Stats",
           "request": {
             "method": "GET",
             "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
-            "url": { "raw": "{{base_url}}/get-counts", "host": ["{{base_url}}"], "path": ["get-counts"] }
+            "url": { "raw": "{{base_url}}/admin/dashboard/stats", "host": ["{{base_url}}"], "path": ["admin", "dashboard", "stats"] }
           }
         },
         {
-          "name": "Dashboard - Get All Users",
+          "name": "Dashboard - Recent Orders",
           "request": {
             "method": "GET",
             "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
-            "url": { "raw": "{{base_url}}/get-allUser", "host": ["{{base_url}}"], "path": ["get-allUser"] }
+            "url": { "raw": "{{base_url}}/admin/dashboard/recent-orders?limit=10", "host": ["{{base_url}}"], "path": ["admin", "dashboard", "recent-orders"], "query": [{ "key": "limit", "value": "10" }] }
+          }
+        },
+        {
+          "name": "Dashboard - Recent Products",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "url": { "raw": "{{base_url}}/admin/dashboard/recent-products?limit=10", "host": ["{{base_url}}"], "path": ["admin", "dashboard", "recent-products"], "query": [{ "key": "limit", "value": "10" }] }
+          }
+        },
+        {
+          "name": "Dashboard - Trending Products",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "url": { "raw": "{{base_url}}/admin/dashboard/trending-products?limit=10", "host": ["{{base_url}}"], "path": ["admin", "dashboard", "trending-products"], "query": [{ "key": "limit", "value": "10" }] }
+          }
+        },
+        {
+          "name": "Dashboard - Sales Analytics (Monthly)",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "url": { "raw": "{{base_url}}/admin/dashboard/sales-analytics?period=monthly", "host": ["{{base_url}}"], "path": ["admin", "dashboard", "sales-analytics"], "query": [{ "key": "period", "value": "monthly" }] }
+          }
+        },
+        {
+          "name": "Dashboard - Sales Analytics (Weekly)",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "url": { "raw": "{{base_url}}/admin/dashboard/sales-analytics?period=weekly", "host": ["{{base_url}}"], "path": ["admin", "dashboard", "sales-analytics"], "query": [{ "key": "period", "value": "weekly" }] }
+          }
+        },
+        {
+          "name": "Dashboard - Sales Analytics (Daily)",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "url": { "raw": "{{base_url}}/admin/dashboard/sales-analytics?period=daily", "host": ["{{base_url}}"], "path": ["admin", "dashboard", "sales-analytics"], "query": [{ "key": "period", "value": "daily" }] }
+          }
+        },
+        {
+          "name": "Dashboard - User Analytics",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "url": { "raw": "{{base_url}}/admin/dashboard/user-analytics?period=monthly", "host": ["{{base_url}}"], "path": ["admin", "dashboard", "user-analytics"], "query": [{ "key": "period", "value": "monthly" }] }
+          }
+        },
+        {
+          "name": "Dashboard - Product Analytics",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "url": { "raw": "{{base_url}}/admin/dashboard/product-analytics", "host": ["{{base_url}}"], "path": ["admin", "dashboard", "product-analytics"] }
+          }
+        },
+        {
+          "name": "Dashboard - Order Analytics",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "url": { "raw": "{{base_url}}/admin/dashboard/order-analytics", "host": ["{{base_url}}"], "path": ["admin", "dashboard", "order-analytics"] }
+          }
+        },
+        {
+          "name": "Dashboard - Revenue Analytics",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "url": { "raw": "{{base_url}}/admin/dashboard/revenue-analytics?period=monthly", "host": ["{{base_url}}"], "path": ["admin", "dashboard", "revenue-analytics"], "query": [{ "key": "period", "value": "monthly" }] }
+          }
+        },
+        {
+          "name": "Dashboard - Top Selling Categories",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "url": { "raw": "{{base_url}}/admin/dashboard/top-categories?limit=5", "host": ["{{base_url}}"], "path": ["admin", "dashboard", "top-categories"], "query": [{ "key": "limit", "value": "5" }] }
+          }
+        },
+        {
+          "name": "Dashboard - All Charts Data",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "url": { "raw": "{{base_url}}/admin/dashboard/charts", "host": ["{{base_url}}"], "path": ["admin", "dashboard", "charts"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Dashboard (Summary)",
+      "item": [
+        {
+          "name": "Dashboard - Summary (Stats + Charts + Recent)",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "url": {
+              "raw": "{{base_url}}/admin/dashboard/summary?period=monthly&recentLimit=10&topCategoriesLimit=5&lowStockThreshold=10",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "dashboard", "summary"],
+              "query": [
+                { "key": "period", "value": "monthly" },
+                { "key": "recentLimit", "value": "10" },
+                { "key": "topCategoriesLimit", "value": "5" },
+                { "key": "lowStockThreshold", "value": "10" }
+              ]
+            }
           }
         }
       ]

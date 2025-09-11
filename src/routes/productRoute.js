@@ -42,6 +42,7 @@ import {
   updateProductStock,
   toggleProductStatus,
   toggleFeaturedStatus,
+  getLowStockProducts,
 } from "../controllers/product/productController.js";
 
 import uploadController from "../controllers/uploadImagesController.js";
@@ -95,6 +96,9 @@ router.post(
 
 // <!-- ======admin -  get count for dashboard route ====== -->
 router.get("/get-counts", isAuthenticated, getCounts);
+
+// <!-- ====== admin - low stock products report ====== -->
+router.get("/admin/low-stock", [isAuthenticated, isAdmin], getLowStockProducts);
 
 // <!-- ====== get all users for dashboard route (admin only) ====== -->
 router.get("/get-allUser", [isAuthenticated, isAdmin], getAllUsers);

@@ -1,5 +1,7 @@
 import Joi from "joi";
+import mongoose from "mongoose";
 import logger from "../../config/logger.js";
+import CustomErrorHandler from "../../services/customErrorHandler.js";
 // import { Chat } from "../../models/chatModel/chatModel.js"; // TEMPORARILY DISABLED - Chat functionality not required
 import { Order } from "../../models/productModel/orderModel.js";
 import { PaymentAttempt } from "../../models/productModel/paymentAttemptModel.js";
@@ -164,38 +166,63 @@ export const buyProduct = async (req, res, next) => {
 
   const { cartId, paymentIntent, paymentAttemptId } = req.body;
 
+  const session = await mongoose.startSession();
   try {
-    await CartItems.updateMany({ _id: { $in: cartId } }, { isActive: false });
-
-    const updatedCartItemsDetails = await CartItems.find({
+    const result = await session.withTransaction(async () => {
+      // Fetch active cart items in the transaction
+      const cartItems = await CartItems.find({
       _id: { $in: cartId },
+        isActive: true,
     })
       .populate("sellingProductId")
-      .populate("productId");
+        .populate("productId")
+        .session(session);
 
-    // Adjust inventory for each cart item depending on source
-    for (const data of updatedCartItemsDetails) {
-      if (data.sellingProductId) {
-        // Legacy path: decrement SellingProduct quantity
-        const productData = await SellingProduct.findById(
-          data.sellingProductId._id,
-        );
-        const remainingQuantity = (productData?.quantity || 0) - data.quantity;
-        await SellingProduct.findByIdAndUpdate(data.sellingProductId._id, {
-          quantity: remainingQuantity,
-        });
-      } else if (data.productId) {
-        // New path: decrement Product stockQuantity
-        await Product.findByIdAndUpdate(
-          data.productId,
-          { $inc: { stockQuantity: -data.quantity } },
-          { new: true },
-        );
+      if (!cartItems.length) {
+        return { orders: [], empty: true };
       }
-    }
 
+      // Validate and decrement stock atomically per item
+      for (const item of cartItems) {
+        const desiredQty = item.quantity || 0;
+        if (desiredQty <= 0) {
+          throw CustomErrorHandler.badRequest("Invalid quantity in cart item.");
+        }
+
+        if (item.sellingProductId) {
+          // Conditional decrement: only if enough quantity
+          const dec = await SellingProduct.findOneAndUpdate(
+            { _id: item.sellingProductId._id, quantity: { $gte: desiredQty } },
+            { $inc: { quantity: -desiredQty } },
+            { new: true, session },
+          );
+          if (!dec) {
+            throw CustomErrorHandler.badRequest("Insufficient stock for selected selling product.");
+          }
+        } else if (item.productId) {
+          const dec = await Product.findOneAndUpdate(
+            { _id: item.productId._id, stockQuantity: { $gte: desiredQty } },
+            { $inc: { stockQuantity: -desiredQty } },
+            { new: true, session },
+          );
+          if (!dec) {
+            throw CustomErrorHandler.badRequest("Insufficient stock for selected product.");
+          }
+        } else {
+          throw CustomErrorHandler.badRequest("Cart item missing product reference.");
+        }
+      }
+
+      // Deactivate cart items once decremented
+      await CartItems.updateMany(
+        { _id: { $in: cartId } },
+        { isActive: false },
+        { session },
+      );
+
+      // Create orders inside the transaction
     const orders = await Order.insertMany(
-      updatedCartItemsDetails.map((item) => ({
+        cartItems.map((item) => ({
         quantity: item.quantity,
         totalAmount: item.totalAmount,
         userId: req.user._id,
@@ -208,24 +235,33 @@ export const buyProduct = async (req, res, next) => {
         paymentIntent,
         isPaid: true,
       })),
+        { session }
     );
 
-    await Order.populate(orders, { path: "sellProductId" });
-    await Order.populate(orders, { path: "productId" });
-
-    // Update payment attempt with order IDs if paymentAttemptId is provided
+      // Link payment attempt if present
     if (paymentAttemptId) {
       await PaymentAttempt.findByIdAndUpdate(
         paymentAttemptId,
         {
           status: "succeeded",
           orderId: orders.length === 1 ? orders[0]._id : undefined,
-          metadata: {
-            orderIds: orders.map(order => order._id),
-          }
-        }
-      );
+            metadata: { orderIds: orders.map(o => o._id) },
+          },
+          { session }
+        );
+      }
+
+      return { orders };
+    });
+
+    if (result?.empty) {
+      return res.status(400).json({ success: false, message: "No active cart items found." });
     }
+
+    const orders = result.orders;
+
+    await Order.populate(orders, { path: "sellProductId" });
+    await Order.populate(orders, { path: "productId" });
 
     // --- DEDUPLICATE CHAT CREATION LOGIC ---
     // Group orders by seller for chat creation
@@ -316,6 +352,8 @@ export const buyProduct = async (req, res, next) => {
   } catch (error) {
     logger.error(error.message);
     return next(error);
+  } finally {
+    session.endSession();
   }
 };
 

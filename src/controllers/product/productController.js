@@ -825,6 +825,48 @@ export const getCounts = async (req, res, next) => {
   }
 };
 
+// <!-- ====== list low stock products (admin) ====== -->
+export const getLowStockProducts = async (req, res, next) => {
+  const Joi = (await import("joi")).default;
+  const schema = Joi.object({
+    threshold: Joi.number().min(0).default(10),
+    skip: Joi.number().min(0).default(0),
+    limit: Joi.number().min(1).max(100).default(20),
+    includeInactive: Joi.boolean().default(false),
+  });
+
+  const { error, value } = schema.validate(req.query);
+  if (error) return next(error);
+
+  const { threshold, skip, limit, includeInactive } = value;
+
+  try {
+    const filter = {
+      stockQuantity: { $lt: threshold },
+      ...(includeInactive ? {} : { isActive: true })
+    };
+
+    const [items, total] = await Promise.all([
+      Product.find(filter)
+        .select("productName stockQuantity image categoryId isActive")
+        .populate("categoryId", "categoryName")
+        .sort({ stockQuantity: 1 })
+        .skip(skip)
+        .limit(limit),
+      Product.countDocuments(filter)
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data: items,
+      pagination: { skip, limit, total }
+    });
+  } catch (error) {
+    logger.error(error.message);
+    return next(error);
+  }
+};
+
 // <!-- ====== get all users controller ====== -->
 export const getAllUsers = async (req, res, next) => {
   try {
