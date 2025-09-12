@@ -466,25 +466,146 @@ export const getTopSellingCategories = async (req, res, next) => {
 // Get dashboard charts data
 export const getDashboardCharts = async (req, res, next) => {
   try {
+    const { period = 'monthly' } = req.query;
+    
+    // Get sales analytics data
+    let startDate;
+    const now = new Date();
+    switch (period) {
+      case 'daily':
+        startDate = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
+        break;
+      case 'weekly':
+        startDate = new Date(now.getTime() - (12 * 7 * 24 * 60 * 60 * 1000));
+        break;
+      case 'monthly':
+      default:
+        startDate = new Date(now.getFullYear() - 1, now.getMonth(), 1);
+        break;
+    }
+
     const [
-      salesChart,
-      userChart,
-      productChart,
-      revenueChart
+      salesData,
+      userStats,
+      productStats,
+      revenueData
     ] = await Promise.all([
-      getSalesAnalytics({ query: { period: 'monthly' } }, null, null),
-      getUserAnalytics({ query: { period: 'monthly' } }, null, null),
-      getProductAnalytics({}, null, null),
-      getRevenueAnalytics({ query: { period: 'monthly' } }, null, null)
+      // Sales analytics
+      Order.aggregate([
+        { 
+          $match: { 
+            status: "complete",
+            createdAt: { $gte: startDate }
+          }
+        },
+        {
+          $group: {
+            _id: {
+              year: { $year: "$createdAt" },
+              month: { $month: "$createdAt" }
+            },
+            totalOrders: { $sum: 1 },
+            totalRevenue: { $sum: "$totalAmount" },
+            averageOrderValue: { $avg: "$totalAmount" }
+          }
+        },
+        { $sort: { "_id.year": 1, "_id.month": 1 } }
+      ]),
+      
+      // User analytics
+      User.aggregate([
+        {
+          $match: {
+            createdAt: { $gte: startDate }
+          }
+        },
+        {
+          $group: {
+            _id: {
+              year: { $year: "$createdAt" },
+              month: { $month: "$createdAt" }
+            },
+            newUsers: { $sum: 1 }
+          }
+        },
+        { $sort: { "_id.year": 1, "_id.month": 1 } }
+      ]),
+      
+      // Product analytics
+      Promise.all([
+        Product.countDocuments(),
+        Product.countDocuments({ isActive: true }),
+        Product.countDocuments({ isFeatured: true }),
+        Product.countDocuments({ stockQuantity: { $lt: 10 } }),
+        Product.aggregate([
+          { $group: { _id: "$categoryId", count: { $sum: 1 } } },
+          { $lookup: {
+            from: "categories",
+            localField: "_id",
+            foreignField: "_id",
+            as: "categoryInfo"
+          }},
+          { $unwind: "$categoryInfo" },
+          { $project: {
+            categoryName: "$categoryInfo.categoryName",
+            count: 1
+          }},
+          { $sort: { count: -1 } }
+        ])
+      ]),
+      
+      // Revenue analytics
+      Order.aggregate([
+        {
+          $match: {
+            status: "complete",
+            createdAt: { $gte: startDate }
+          }
+        },
+        {
+          $group: {
+            _id: {
+              year: { $year: "$createdAt" },
+              month: { $month: "$createdAt" }
+            },
+            totalRevenue: { $sum: "$totalAmount" },
+            orderCount: { $sum: 1 }
+          }
+        },
+        { $sort: { "_id.year": 1, "_id.month": 1 } }
+      ])
     ]);
+
+    const [totalProducts, activeProducts, featuredProducts, lowStockProducts, categoryStats] = productStats;
 
     res.status(200).json({
       success: true,
       data: {
-        salesChart: salesChart.data,
-        userChart: userChart.data,
-        productChart: productChart.data,
-        revenueChart: revenueChart.data
+        salesChart: {
+          period,
+          salesData
+        },
+        userChart: {
+          period,
+          totalUsers: await User.countDocuments(),
+          activeUsers: await User.countDocuments({ isActive: true }),
+          userGrowth: userStats
+        },
+        productChart: {
+          totalProducts,
+          activeProducts,
+          featuredProducts,
+          lowStockProducts,
+          categoryStats
+        },
+        revenueChart: {
+          period,
+          totalRevenue: await Order.aggregate([
+            { $match: { status: "complete" } },
+            { $group: { _id: null, total: { $sum: "$totalAmount" } } }
+          ]).then(result => result.length > 0 ? result[0].total : 0),
+          revenueData
+        }
       }
     });
   } catch (err) {

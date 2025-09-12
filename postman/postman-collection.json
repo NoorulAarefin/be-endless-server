@@ -1,14 +1,20 @@
 {
   "info": {
     "_postman_id": "be-endless-api-collection-clean",
-    "name": "Be-Endless API (Clean)",
-    "description": "Readable, accurate API collection for Be-Endless backend. Matches current routes and request bodies.",
+    "name": "Be-Endless API (Production Ready)",
+    "description": "Complete API collection for Be-Endless e-commerce backend. Includes admin dashboard, hero banners, product management, and all core functionality. Updated with latest fixes and optimizations.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     { "key": "base_url", "value": "http://localhost:3000", "type": "string" },
     { "key": "access_token", "value": "", "type": "string" },
-    { "key": "refresh_token", "value": "", "type": "string" }
+    { "key": "refresh_token", "value": "", "type": "string" },
+    { "key": "banner_id", "value": "", "type": "string" },
+    { "key": "product_id", "value": "", "type": "string" },
+    { "key": "category_id", "value": "", "type": "string" },
+    { "key": "order_id", "value": "", "type": "string" },
+    { "key": "cart_id", "value": "", "type": "string" },
+    { "key": "payment_attempt_id", "value": "", "type": "string" }
   ],
   "item": [
     {
@@ -738,11 +744,27 @@
           }
         },
         {
-          "name": "Dashboard - All Charts Data",
+          "name": "Dashboard - All Charts Data (Monthly)",
           "request": {
             "method": "GET",
             "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
-            "url": { "raw": "{{base_url}}/admin/dashboard/charts", "host": ["{{base_url}}"], "path": ["admin", "dashboard", "charts"] }
+            "url": { "raw": "{{base_url}}/admin/dashboard/charts?period=monthly", "host": ["{{base_url}}"], "path": ["admin", "dashboard", "charts"], "query": [{ "key": "period", "value": "monthly" }] }
+          }
+        },
+        {
+          "name": "Dashboard - All Charts Data (Weekly)",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "url": { "raw": "{{base_url}}/admin/dashboard/charts?period=weekly", "host": ["{{base_url}}"], "path": ["admin", "dashboard", "charts"], "query": [{ "key": "period", "value": "weekly" }] }
+          }
+        },
+        {
+          "name": "Dashboard - All Charts Data (Daily)",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "url": { "raw": "{{base_url}}/admin/dashboard/charts?period=daily", "host": ["{{base_url}}"], "path": ["admin", "dashboard", "charts"], "query": [{ "key": "period", "value": "daily" }] }
           }
         }
       ]
@@ -766,6 +788,49 @@
                 { "key": "lowStockThreshold", "value": "10" }
               ]
             }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Quick Test Suite",
+      "item": [
+        {
+          "name": "Test - Server Health",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/", "host": ["{{base_url}}"], "path": [""] }
+          }
+        },
+        {
+          "name": "Test - Admin Login (Get Token)",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"admin123\"\n}" },
+            "url": { "raw": "{{base_url}}/login", "host": ["{{base_url}}"], "path": ["login"] }
+          }
+        },
+        {
+          "name": "Test - Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "url": { "raw": "{{base_url}}/admin/dashboard/stats", "host": ["{{base_url}}"], "path": ["admin", "dashboard", "stats"] }
+          }
+        },
+        {
+          "name": "Test - Hero Banners List",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/hero-banners", "host": ["{{base_url}}"], "path": ["hero-banners"] }
+          }
+        },
+        {
+          "name": "Test - Categories List",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/get-category", "host": ["{{base_url}}"], "path": ["get-category"] }
           }
         }
       ]

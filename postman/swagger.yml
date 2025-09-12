@@ -1,9 +1,10 @@
 openapi: 3.0.0
 info:
-  title: Be-Endless API (Clean)
+  title: Be-Endless API (Production Ready)
   description: >-
-    Readable, accurate API collection for Be-Endless backend. Matches current
-    routes and request bodies.
+    Complete API collection for Be-Endless e-commerce backend. Includes admin
+    dashboard, hero banners, product management, and all core functionality.
+    Updated with latest fixes and optimizations.
   version: 1.0.0
 servers:
   - url: http://{{base_url}}
@@ -21,6 +22,7 @@ tags:
   - name: Admin - Products
   - name: Admin - Dashboard
   - name: Admin - Dashboard (Summary)
+  - name: Quick Test Suite
 paths:
   /signup:
     post:
@@ -50,16 +52,16 @@ paths:
   /login:
     post:
       tags:
-        - Authentication
-      summary: Auth - Login
+        - Quick Test Suite
+      summary: Test - Admin Login (Get Token)
       requestBody:
         content:
           '*/*':
             schema:
               type: string
               example: >-
-                "{\n  \"email\": \"john@example.com\",\n  \"password\":
-                \"Secret123\"\n}"
+                "{\n  \"email\": \"admin@example.com\",\n  \"password\":
+                \"admin123\"\n}"
       parameters:
         - name: Content-Type
           in: header
@@ -486,8 +488,8 @@ paths:
             application/json: {}
     get:
       tags:
-        - Hero Banners
-      summary: Hero Banners - List (Public)
+        - Quick Test Suite
+      summary: Test - Hero Banners List
       responses:
         '200':
           description: Successful response
@@ -1033,8 +1035,8 @@ paths:
   /get-category:
     get:
       tags:
-        - Admin - Categories
-      summary: Categories - Get (Public)
+        - Quick Test Suite
+      summary: Test - Categories List
       responses:
         '200':
           description: Successful response
@@ -1284,8 +1286,8 @@ paths:
   /admin/dashboard/stats:
     get:
       tags:
-        - Admin - Dashboard
-      summary: Dashboard - Overview Stats
+        - Quick Test Suite
+      summary: Test - Dashboard Stats
       parameters:
         - name: Authorization
           in: header
@@ -1480,13 +1482,18 @@ paths:
     get:
       tags:
         - Admin - Dashboard
-      summary: Dashboard - All Charts Data
+      summary: Dashboard - All Charts Data (Daily)
       parameters:
         - name: Authorization
           in: header
           schema:
             type: string
           example: Bearer {{access_token}}
+        - name: period
+          in: query
+          schema:
+            type: string
+          example: daily
       responses:
         '200':
           description: Successful response
@@ -1523,6 +1530,16 @@ paths:
           schema:
             type: integer
           example: '10'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /:
+    get:
+      tags:
+        - Quick Test Suite
+      summary: Test - Server Health
       responses:
         '200':
           description: Successful response
