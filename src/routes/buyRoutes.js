@@ -14,6 +14,7 @@ import {
   getAllOrders,
   getCartDetailsByIds,
   getOrdersWithPayments,
+  getUnifiedOrderDetails,
 } from "../controllers/trade/buyProductController.js";
 
 const router = express.Router();
@@ -50,6 +51,9 @@ router.post("/get-allOrders", [isAuthenticated, isAdmin], getAllOrders);
 
 // ====== admin - get all orders with payment details (combined, clean) ======
 router.get("/admin/orders-with-payments", [isAuthenticated, isAdmin], getOrdersWithPayments);
+
+// ====== UNIFIED ADMIN API: Complete Order & Payment Details ======
+router.get("/admin/unified-orders", [isAuthenticated, isAdmin], getUnifiedOrderDetails);
 
 // <!-- ====== update order status route (admin only) ====== -->
 router.post("/update-order-status", [isAuthenticated, isAdmin], updateOrderStatus);

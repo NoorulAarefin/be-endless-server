@@ -685,7 +685,10 @@ paths:
               type: string
               example: >-
                 "{\n  \"cartId\": [\"{{cart_id}}\"],\n  \"paymentAttemptId\":
-                \"{{payment_attempt_id}}\"\n}"
+                \"{{payment_attempt_id}}\",\n  \"deliveryAddress\": {\n   
+                \"label\": \"Home\",\n    \"street\": \"123 Main Street\",\n   
+                \"city\": \"New York\",\n    \"state\": \"NY\",\n   
+                \"postalCode\": \"10001\",\n    \"country\": \"USA\"\n  }\n}"
       parameters:
         - name: Authorization
           in: header
@@ -706,13 +709,13 @@ paths:
     post:
       tags:
         - Orders
-      summary: Orders - My Orders
+      summary: Orders - My Orders (Buyer Only)
       requestBody:
         content:
           '*/*':
             schema:
               type: string
-              example: '"{\n  \"isSeller\": false\n}"'
+              example: '"{}"'
       parameters:
         - name: Authorization
           in: header
@@ -739,7 +742,9 @@ paths:
           '*/*':
             schema:
               type: string
-              example: '"{\n  \"orderId\": \"{{order_id}}\",\n  \"isSeller\": false\n}"'
+              example: >-
+                "{\n  \"orderId\": \"{{order_id}}\",\n  \"status\":
+                \"complete\"\n}"
       parameters:
         - name: Authorization
           in: header
@@ -815,19 +820,60 @@ paths:
           description: Successful response
           content:
             application/json: {}
+  /admin/unified-orders:
+    get:
+      tags:
+        - Orders
+      summary: Orders (Admin) - Unified Orders
+      parameters:
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+          example: Bearer {{access_token}}
+        - name: limit
+          in: query
+          schema:
+            type: integer
+          example: '20'
+        - name: status
+          in: query
+          schema:
+            type: string
+          example: complete
+        - name: paymentStatus
+          in: query
+          schema:
+            type: string
+          example: completed
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+          example: createdAt
+        - name: sortOrder
+          in: query
+          schema:
+            type: string
+          example: desc
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
   /api/payments/create:
     post:
       tags:
         - Payments
-      summary: Payments - Create Attempt (Cart)
+      summary: Payments - Create Attempt (Direct Product)
       requestBody:
         content:
           '*/*':
             schema:
               type: string
               example: >-
-                "{\n  \"amount\": 2400,\n  \"cartId\": [\"{{cart_id}}\"],\n 
-                \"paymentMethod\": \"COD\"\n}"
+                "{\n  \"amount\": 1200,\n  \"productId\": \"{{product_id}}\",\n 
+                \"quantity\": 1,\n  \"paymentMethod\": \"Online\"\n}"
       parameters:
         - name: Authorization
           in: header

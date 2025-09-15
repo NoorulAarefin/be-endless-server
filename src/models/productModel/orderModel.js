@@ -20,10 +20,7 @@ const Schema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
-    sellerId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    },
+    // sellerId removed in single-seller model
     productId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Product",

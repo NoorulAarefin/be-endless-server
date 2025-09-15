@@ -1,8 +1,8 @@
 import Joi from "joi";
 import logger from "../../config/logger.js";
-import { Order } from "../../models/productModel/orderModel.js";
+// import { Order } from "../../models/productModel/orderModel.js";
 import { PaymentAttempt } from "../../models/productModel/paymentAttemptModel.js";
-import { User } from "../../models/authModel/userModel.js";
+// import { User } from "../../models/authModel/userModel.js";
 import { SellingProduct } from "../../models/productModel/sellingProductModel.js";
 import { CartItems } from "../../models/productModel/cartModel.js";
 
@@ -63,7 +63,7 @@ export const createPaymentAttempt = async (req, res, next) => {
       quantity,
       totalAmount: amount,
       buyerId: req.user._id,
-      sellerId: sellerId,
+      // seller removed in single-seller model
     });
 
     res.json({
@@ -130,7 +130,7 @@ export const getAllPaymentAttemptsFromDB = async (req, res, next) => {
   try {
     const paymentAttempts = await PaymentAttempt.find()
       .populate("buyerId", "fullName email avatar")
-      .populate("sellerId", "fullName email avatar")
+      // seller removed in single-seller model
       .populate("productId", "productName image description")
       .populate("orderId")
       .sort({ createdAt: -1 });
@@ -178,10 +178,9 @@ export const getPaymentAttemptsByUser = async (req, res, next) => {
     const userId = req.user._id;
     
     const paymentAttempts = await PaymentAttempt.find({
-      $or: [{ buyerId: userId }, { sellerId: userId }]
+      buyerId: userId
     })
       .populate("buyerId", "fullName email avatar")
-      .populate("sellerId", "fullName email avatar")
       .populate("productId", "productName image description")
       .populate("orderId")
       .sort({ createdAt: -1 });

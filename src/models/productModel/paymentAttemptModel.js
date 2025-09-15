@@ -54,10 +54,7 @@ const paymentAttemptSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    sellerId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    },
+    // sellerId removed in single-seller model
     
     // Additional metadata
     metadata: {

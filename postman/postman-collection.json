@@ -353,19 +353,19 @@
               { "key": "Authorization", "value": "Bearer {{access_token}}" },
               { "key": "Content-Type", "value": "application/json" }
             ],
-            "body": { "mode": "raw", "raw": "{\n  \"cartId\": [\"{{cart_id}}\"],\n  \"paymentAttemptId\": \"{{payment_attempt_id}}\"\n}" },
+            "body": { "mode": "raw", "raw": "{\n  \"cartId\": [\"{{cart_id}}\"],\n  \"paymentAttemptId\": \"{{payment_attempt_id}}\",\n  \"deliveryAddress\": {\n    \"label\": \"Home\",\n    \"street\": \"123 Main Street\",\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"postalCode\": \"10001\",\n    \"country\": \"USA\"\n  }\n}" },
             "url": { "raw": "{{base_url}}/buy-product", "host": ["{{base_url}}"], "path": ["buy-product"] }
           }
         },
         {
-          "name": "Orders - My Orders",
+          "name": "Orders - My Orders (Buyer Only)",
           "request": {
             "method": "POST",
             "header": [
               { "key": "Authorization", "value": "Bearer {{access_token}}" },
               { "key": "Content-Type", "value": "application/json" }
             ],
-            "body": { "mode": "raw", "raw": "{\n  \"isSeller\": false\n}" },
+            "body": { "mode": "raw", "raw": "{}" },
             "url": { "raw": "{{base_url}}/get-myOrders", "host": ["{{base_url}}"], "path": ["get-myOrders"] }
           }
         },
@@ -377,7 +377,7 @@
               { "key": "Authorization", "value": "Bearer {{access_token}}" },
               { "key": "Content-Type", "value": "application/json" }
             ],
-            "body": { "mode": "raw", "raw": "{\n  \"orderId\": \"{{order_id}}\",\n  \"isSeller\": false\n}" },
+            "body": { "mode": "raw", "raw": "{\n  \"orderId\": \"{{order_id}}\",\n  \"status\": \"complete\"\n}" },
             "url": { "raw": "{{base_url}}/update-order-status", "host": ["{{base_url}}"], "path": ["update-order-status"] }
           }
         },
@@ -408,6 +408,25 @@
             "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
             "url": { "raw": "{{base_url}}/admin/orders-with-payments", "host": ["{{base_url}}"], "path": ["admin", "orders-with-payments"] }
           }
+        },
+        {
+          "name": "Orders (Admin) - Unified Orders",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{access_token}}" } ],
+            "url": {
+              "raw": "{{base_url}}/admin/unified-orders?limit=20&status=complete&paymentStatus=completed&sortBy=createdAt&sortOrder=desc",
+              "host": ["{{base_url}}"],
+              "path": ["admin", "unified-orders"],
+              "query": [
+                { "key": "limit", "value": "20" },
+                { "key": "status", "value": "complete" },
+                { "key": "paymentStatus", "value": "completed" },
+                { "key": "sortBy", "value": "createdAt" },
+                { "key": "sortOrder", "value": "desc" }
+              ]
+            }
+          }
         }
       ]
     },
@@ -423,6 +442,18 @@
               { "key": "Content-Type", "value": "application/json" }
             ],
             "body": { "mode": "raw", "raw": "{\n  \"amount\": 2400,\n  \"cartId\": [\"{{cart_id}}\"],\n  \"paymentMethod\": \"COD\"\n}" },
+            "url": { "raw": "{{base_url}}/api/payments/create", "host": ["{{base_url}}"], "path": ["api", "payments", "create"] }
+          }
+        },
+        {
+          "name": "Payments - Create Attempt (Direct Product)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{access_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"amount\": 1200,\n  \"productId\": \"{{product_id}}\",\n  \"quantity\": 1,\n  \"paymentMethod\": \"Online\"\n}" },
             "url": { "raw": "{{base_url}}/api/payments/create", "host": ["{{base_url}}"], "path": ["api", "payments", "create"] }
           }
         },

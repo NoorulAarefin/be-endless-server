@@ -62,7 +62,7 @@ export const getRecentOrders = async (req, res, next) => {
     const recentOrders = await Order.find()
       .populate('userId', 'fullName email mobileNo')
       .populate('productId', 'productName price image')
-      .populate('sellerId', 'fullName email mobileNo')
+      // seller removed in single-seller model
       .sort({ createdAt: -1 })
       .limit(parseInt(limit));
 
