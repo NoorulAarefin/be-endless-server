@@ -76,6 +76,8 @@ router.put("/update-product", [isAuthenticated, isAdmin, fileUpload.fields([
 
 // <!-- ====== delete product route (admin only) ====== -->
 router.delete("/delete-product", [isAuthenticated, isAdmin], deleteProduct);
+// Temporary POST alias to avoid client breakage; accepts same body
+router.post("/delete-product", [isAuthenticated, isAdmin], deleteProduct);
 
 // <!-- ====== update product stock (admin only) ====== -->
 router.patch("/update-stock", [isAuthenticated, isAdmin], updateProductStock);

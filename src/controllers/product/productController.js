@@ -538,8 +538,9 @@ export const updateProduct = async (req, res, next) => {
 // <!-- ====== delete product controller (admin only) ====== -->
 export const deleteProduct = async (req, res, next) => {
   const schema = Joi.object({
-    productId: Joi.string().required()
-  });
+    productId: Joi.string(),
+    id: Joi.string(),
+  }).or('productId', 'id');
 
   const { error } = schema.validate(req.body);
   if (error) {
@@ -547,9 +548,10 @@ export const deleteProduct = async (req, res, next) => {
   }
 
   try {
-    const { productId } = req.body;
+    const { productId, id } = req.body;
+    const targetId = productId || id;
 
-    const product = await Product.findByIdAndDelete(productId);
+    const product = await Product.findByIdAndDelete(targetId);
 
     if (!product) {
       return res.status(404).json({ 

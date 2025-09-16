@@ -10,7 +10,8 @@ let server;
 const startServer = async () => {
   await connectDB();
 
-  const PORT = Config.PORT;
+  // Prefer platform-provided PORT (e.g., Render), then env-configured, then local default
+  const PORT = process.env.PORT || Config.PORT || 10000;
 
   try {
     server = app.listen(PORT, () => logger.info(`Server listening on ${PORT}`));

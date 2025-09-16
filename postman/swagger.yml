@@ -685,7 +685,8 @@ paths:
               type: string
               example: >-
                 "{\n  \"cartId\": [\"{{cart_id}}\"],\n  \"paymentAttemptId\":
-                \"{{payment_attempt_id}}\",\n  \"deliveryAddress\": {\n   
+                \"{{payment_attempt_id}}\",\n  \"paymentMethod\":
+                \"{{payment_method}}\",\n  \"deliveryAddress\": {\n   
                 \"label\": \"Home\",\n    \"street\": \"123 Main Street\",\n   
                 \"city\": \"New York\",\n    \"state\": \"NY\",\n   
                 \"postalCode\": \"10001\",\n    \"country\": \"USA\"\n  }\n}"
@@ -873,7 +874,8 @@ paths:
               type: string
               example: >-
                 "{\n  \"amount\": 1200,\n  \"productId\": \"{{product_id}}\",\n 
-                \"quantity\": 1,\n  \"paymentMethod\": \"Online\"\n}"
+                \"quantity\": 1,\n  \"paymentMethod\":
+                \"{{payment_method}}\"\n}"
       parameters:
         - name: Authorization
           in: header

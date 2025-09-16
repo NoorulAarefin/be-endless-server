@@ -23,8 +23,23 @@ import { Config } from "./config/index.js";
 
 const app = express();
 
-//for fixing CORS policy.
-app.use(cors());
+// CORS: Explicitly allow admin/frontend origins and common methods/headers
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow non-browser tools (no origin) and the configured frontend URL
+    const allowed = [Config.FRONTEND_URL, Config.BACKEND_URL].filter(Boolean);
+    if (!origin || allowed.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(null, true); // fallback: allow any origin to avoid blocking admin temporarily
+  },
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Authorization", "Content-Type"],
+  credentials: false,
+}));
+
+// Ensure preflight requests are answered quickly
+app.options("*", cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
