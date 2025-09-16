@@ -180,6 +180,7 @@ export const buyProduct = async (req, res, next) => {
     cartId: Joi.array().items(Joi.string().required()),
     paymentIntent: Joi.string(),
     paymentAttemptId: Joi.string(), // Add paymentAttemptId to link with payment attempt
+    paymentMethod: Joi.string().valid("COD", "Online", "Bank Transfer", "Cash").default("COD"),
     deliveryAddress: Joi.object({
       label: Joi.string().allow(''),
       street: Joi.string().required(),
@@ -199,11 +200,24 @@ export const buyProduct = async (req, res, next) => {
     return next(error);
   }
 
-  const { cartId, paymentIntent, paymentAttemptId, deliveryAddress } = req.body;
+  const { cartId, paymentIntent, paymentAttemptId, deliveryAddress, paymentMethod: bodyPaymentMethod } = req.body;
 
   const session = await mongoose.startSession();
   try {
     const result = await session.withTransaction(async () => {
+      // If a paymentAttemptId is provided, fetch it to determine selected payment method
+      let selectedPaymentMethod = bodyPaymentMethod || "COD";
+      let linkedPaymentAttempt = null;
+      if (paymentAttemptId) {
+        linkedPaymentAttempt = await PaymentAttempt.findById(paymentAttemptId).session(session);
+        if (!linkedPaymentAttempt) {
+          throw CustomErrorHandler.badRequest("Invalid payment attempt.");
+        }
+        if (linkedPaymentAttempt.paymentMethod) {
+          selectedPaymentMethod = linkedPaymentAttempt.paymentMethod;
+        }
+      }
+
       // Fetch active cart items in the transaction
       const cartItems = await CartItems.find({
       _id: { $in: cartId },
@@ -266,25 +280,27 @@ export const buyProduct = async (req, res, next) => {
         sellProductId: item.sellingProductId ? item.sellingProductId._id : undefined,
         categoryId: item.categoryId,
         deliveryAddress: deliveryAddress,
-        status: "initialized",
+        status: (selectedPaymentMethod === "COD" || selectedPaymentMethod === "Bank Transfer" || selectedPaymentMethod === "Cash") ? "pending" : "initialized",
         paymentIntent,
-        isPaid: true,
+        paymentMethod: selectedPaymentMethod,
+        isPaid: selectedPaymentMethod === "Online",
       })),
         { session }
     );
 
       // Link payment attempt if present
     if (paymentAttemptId) {
+      const nextStatus = (linkedPaymentAttempt?.paymentMethod === "Online") ? "completed" : "processing";
       await PaymentAttempt.findByIdAndUpdate(
         paymentAttemptId,
         {
-          status: "succeeded",
+          status: nextStatus,
           orderId: orders.length === 1 ? orders[0]._id : undefined,
-            metadata: { orderIds: orders.map(o => o._id) },
-          },
-          { session }
-        );
-      }
+          metadata: { ...(linkedPaymentAttempt?.metadata || {}), orderIds: orders.map(o => o._id) },
+        },
+        { session }
+      );
+    }
 
       return { orders };
     });

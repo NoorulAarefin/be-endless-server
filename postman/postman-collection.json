@@ -14,7 +14,8 @@
     { "key": "category_id", "value": "", "type": "string" },
     { "key": "order_id", "value": "", "type": "string" },
     { "key": "cart_id", "value": "", "type": "string" },
-    { "key": "payment_attempt_id", "value": "", "type": "string" }
+    { "key": "payment_attempt_id", "value": "", "type": "string" },
+    { "key": "payment_method", "value": "COD", "type": "string" }
   ],
   "item": [
     {
@@ -353,7 +354,7 @@
               { "key": "Authorization", "value": "Bearer {{access_token}}" },
               { "key": "Content-Type", "value": "application/json" }
             ],
-            "body": { "mode": "raw", "raw": "{\n  \"cartId\": [\"{{cart_id}}\"],\n  \"paymentAttemptId\": \"{{payment_attempt_id}}\",\n  \"deliveryAddress\": {\n    \"label\": \"Home\",\n    \"street\": \"123 Main Street\",\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"postalCode\": \"10001\",\n    \"country\": \"USA\"\n  }\n}" },
+            "body": { "mode": "raw", "raw": "{\n  \"cartId\": [\"{{cart_id}}\"],\n  \"paymentAttemptId\": \"{{payment_attempt_id}}\",\n  \"paymentMethod\": \"{{payment_method}}\",\n  \"deliveryAddress\": {\n    \"label\": \"Home\",\n    \"street\": \"123 Main Street\",\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"postalCode\": \"10001\",\n    \"country\": \"USA\"\n  }\n}" },
             "url": { "raw": "{{base_url}}/buy-product", "host": ["{{base_url}}"], "path": ["buy-product"] }
           }
         },
@@ -441,7 +442,7 @@
               { "key": "Authorization", "value": "Bearer {{access_token}}" },
               { "key": "Content-Type", "value": "application/json" }
             ],
-            "body": { "mode": "raw", "raw": "{\n  \"amount\": 2400,\n  \"cartId\": [\"{{cart_id}}\"],\n  \"paymentMethod\": \"COD\"\n}" },
+            "body": { "mode": "raw", "raw": "{\n  \"amount\": 2400,\n  \"cartId\": [\"{{cart_id}}\"],\n  \"paymentMethod\": \"{{payment_method}}\"\n}" },
             "url": { "raw": "{{base_url}}/api/payments/create", "host": ["{{base_url}}"], "path": ["api", "payments", "create"] }
           }
         },
@@ -453,7 +454,7 @@
               { "key": "Authorization", "value": "Bearer {{access_token}}" },
               { "key": "Content-Type", "value": "application/json" }
             ],
-            "body": { "mode": "raw", "raw": "{\n  \"amount\": 1200,\n  \"productId\": \"{{product_id}}\",\n  \"quantity\": 1,\n  \"paymentMethod\": \"Online\"\n}" },
+            "body": { "mode": "raw", "raw": "{\n  \"amount\": 1200,\n  \"productId\": \"{{product_id}}\",\n  \"quantity\": 1,\n  \"paymentMethod\": \"{{payment_method}}\"\n}" },
             "url": { "raw": "{{base_url}}/api/payments/create", "host": ["{{base_url}}"], "path": ["api", "payments", "create"] }
           }
         },
